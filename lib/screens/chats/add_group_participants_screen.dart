@@ -15,6 +15,8 @@ class _AddGroupParticipantsScreenState
     extends State<AddGroupParticipantsScreen> {
   dynamic search = '';
   Widget _buildSearchTF() {
+    // TODO hacer funcional el buscador de jugadores
+    // pasar el termino en el widget SearchPlayerToAddToNewGroup
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
