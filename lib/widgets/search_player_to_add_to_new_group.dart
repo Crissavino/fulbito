@@ -11,12 +11,15 @@ class _SearchPlayerToAddToNewGroupState
   AuthService authService;
   UsersService usersService;
   ChatRoomService chatRoomService;
+  List<User> usersToAdd;
 
   @override
   void initState() {
     this.authService = Provider.of<AuthService>(context, listen: false);
     this.usersService = Provider.of<UsersService>(context, listen: false);
     this.chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+    this.usersToAdd = this.usersService.selectedSearchedUsers;
+
     super.initState();
   }
 

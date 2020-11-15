@@ -9,12 +9,19 @@ class UsersService with ChangeNotifier {
   List<User> _selectedSearchedUsers = [];
   String _termSearched;
 
-  List<User> get selectedSearchedUsers => this._selectedSearchedUsers;
+  get selectedSearchedUsers => this._selectedSearchedUsers;
 
-  set selectedSearchedUsers(List<User> usersToAdd) {
-    print('1111');
-    this._selectedSearchedUsers = [];
-    this._selectedSearchedUsers = usersToAdd;
+  // set selectedSearchedUsers(List<User> usersToAdd) {
+  //   this._selectedSearchedUsers = usersToAdd;
+  //   notifyListeners();
+  // }
+  set selectedSearchedUsers(User userToAdd) {
+    this._selectedSearchedUsers.add(userToAdd);
+    notifyListeners();
+  }
+
+  removeSelectedUser(User userToRemove){
+    this._selectedSearchedUsers.removeWhere((user) => user.id == userToRemove.id);
     notifyListeners();
   }
 

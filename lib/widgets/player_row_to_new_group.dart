@@ -11,23 +11,20 @@ class PlayerRowToNewGroup extends StatefulWidget {
 }
 
 class _PlayerRowToNewGroupState extends State<PlayerRowToNewGroup> {
-  AuthService authService;
-  ChatRoomService chatRoomService;
-  User currentUser;
+  UsersService usersService;
+  List<User> addedUsers;
 
   @override
   void initState() {
-    this.authService = Provider.of<AuthService>(context, listen: false);
-    this.chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
-    this.currentUser = this.authService.usuario;
+    // TODO: implement initState
+    this.usersService = Provider.of<UsersService>(context, listen: false);
+    this.addedUsers = this.usersService.selectedSearchedUsers;
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    UsersService usersService =
-        Provider.of<UsersService>(context, listen: false);
     return Container(
       margin: EdgeInsets.only(top: 10.0, bottom: 2.0, right: 10.0, left: 10.0),
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -41,7 +38,7 @@ class _PlayerRowToNewGroupState extends State<PlayerRowToNewGroup> {
           children: <Widget>[
             _buildPlayerAvatar(),
             _buildPlayerName(),
-            _buildAddPlayerToNewGroupIcon(context, usersService)
+            _buildAddPlayerToNewGroupIcon(context, this.usersService)
           ],
         ),
       ),
@@ -71,10 +68,13 @@ class _PlayerRowToNewGroupState extends State<PlayerRowToNewGroup> {
 
   IconButton _buildAddPlayerToNewGroupIcon(
       BuildContext context, UsersService usersService) {
-    List<User> usersToAdd = usersService.selectedSearchedUsers;
-    print('asdasd');
+
+    bool isAlreadySelected = this.addedUsers
+        .where((User user) => user.id == widget.userInRow.id)
+        .isNotEmpty;
+
     return IconButton(
-      icon: usersToAdd.contains(widget.userInRow)
+      icon: isAlreadySelected
           ? Icon(
               Icons.check,
               color: Colors.blue,
@@ -83,16 +83,10 @@ class _PlayerRowToNewGroupState extends State<PlayerRowToNewGroup> {
       iconSize: 30.0,
       color: Colors.green[400],
       onPressed: () {
-        bool isAlreadySelected = usersToAdd
-            .where((User user) => user.id == widget.userInRow.id)
-            .isNotEmpty;
-
         if (!isAlreadySelected) {
-          usersToAdd.add(widget.userInRow);
-          usersService.selectedSearchedUsers = usersToAdd;
+          usersService.selectedSearchedUsers = widget.userInRow;
         } else {
-          usersToAdd.remove(widget.userInRow);
-          usersService.selectedSearchedUsers = usersToAdd;
+          usersService.removeSelectedUser(widget.userInRow);
         }
       },
     );
