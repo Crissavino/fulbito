@@ -13,7 +13,15 @@ class AddGroupParticipantsScreen extends StatefulWidget {
 
 class _AddGroupParticipantsScreenState
     extends State<AddGroupParticipantsScreen> {
-  dynamic search = '';
+  UsersService usersService;
+
+  @override
+  void initState() {
+    this.usersService = Provider.of<UsersService>(context, listen: false);
+
+    super.initState();
+  }
+
   Widget _buildSearchTF() {
     // TODO hacer funcional el buscador de jugadores
     // pasar el termino en el widget SearchPlayerToAddToNewGroup
@@ -54,9 +62,7 @@ class _AddGroupParticipantsScreenState
                 hintStyle: kHintTextStyle,
               ),
               onChanged: (val) {
-                setState(() {
-                  search = val;
-                });
+                this.usersService.termSearched = val;
               },
             ),
           ),

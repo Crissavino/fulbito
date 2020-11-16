@@ -11,10 +11,6 @@ class UsersService with ChangeNotifier {
 
   get selectedSearchedUsers => this._selectedSearchedUsers;
 
-  // set selectedSearchedUsers(List<User> usersToAdd) {
-  //   this._selectedSearchedUsers = usersToAdd;
-  //   notifyListeners();
-  // }
   set selectedSearchedUsers(User userToAdd) {
     this._selectedSearchedUsers.add(userToAdd);
     notifyListeners();
