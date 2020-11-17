@@ -9,7 +9,6 @@ import 'package:fulbito/services/socket_service.dart';
 import 'package:fulbito/services/users_service.dart';
 import 'package:provider/provider.dart';
 
-part 'horizontal_added_players.dart';
 part 'grid_view_added_players.dart';
 part 'splash.dart';
 part 'player_row_to_new_group.dart';
