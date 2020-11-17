@@ -16,7 +16,6 @@ class _PlayerRowToNewGroupState extends State<PlayerRowToNewGroup> {
 
   @override
   void initState() {
-    // TODO: implement initState
     this.usersService = Provider.of<UsersService>(context, listen: false);
     this.addedUsers = this.usersService.selectedSearchedUsers;
 
