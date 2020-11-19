@@ -180,7 +180,12 @@ class ChatRoomService with ChangeNotifier {
       players: usersToAddToGroup.map((User user) => user.player).toList()
     );
 
-    notifyListeners();
+    // List<ChatRoom> newChatRooms = [];
+    // newChatRooms.add(newChatRoom);
+    // newChatRooms.addAll(this._allChatRooms);
+    // this._allChatRooms = newChatRooms;
+    //
+    // print(this._allChatRooms);
 
     return true;
 

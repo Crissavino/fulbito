@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
@@ -30,6 +33,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
   SocketService socketService;
   List<ChatMessage> _messages = [];
   bool isLoading = false;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -155,6 +159,41 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     );
   }
 
+  _handleSubmit() {
+    if (this.textMessage.length == 0) {
+      return;
+    }
+
+    final newMessage = ChatMessage(
+      texto: this.textMessage,
+      sender: this.currentUser,
+      animationController: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 400),
+      ),
+    );
+    this._messages.insert(0, newMessage);
+    // desp de insertar el mensaje disparo la animacion
+    newMessage.animationController.forward();
+
+    this._focusNode.requestFocus();
+    this._textController.clear();
+
+    // final message = Message();
+    // message.sender = this.currentUser;
+    // message.time = DateTime.now().toIso8601String();
+    // message.text = this.textMessage;
+    // message.isLiked = false;
+    // message.unread = false;
+    // message.language = 'es';
+    // message.chatRoom = this.chatRoom;
+    // this.socketService.socket.emit('mensaje-personal', {
+    //   'de': this.authService.usuario.uuid,
+    //   'para': this.chatService.usuarioPara.uuid,
+    //   'mensaje': texto
+    // });
+  }
+
   Widget _buildMessageComposer() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -180,27 +219,22 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               ),
             ),
           ),
+          Platform.isIOS
+              ? CupertinoButton(
+            child: Text(
+              'Enviar',
+              style: TextStyle(
+                  color: Colors.green[400]
+              ),
+            ),
+            onPressed: () => _handleSubmit(),
+          )
+              :
           IconButton(
             icon: Icon(Icons.send),
             iconSize: 25.0,
             color: Colors.green[400],
-            onPressed: () {
-              bool blank = textMessage?.trim()?.isEmpty ?? true;
-              if (!blank) {
-                final message = Message();
-                message.sender = this.currentUser;
-                message.time = DateTime.now().toIso8601String();
-                message.text = textMessage;
-                message.isLiked = false;
-                message.unread = false;
-                message.language = 'es';
-                message.chatRoom = this.chatRoom;
-
-                _textController.clear();
-              } else {
-                // Fluttertoast.showToast(msg: 'Nothing to send');
-              }
-            },
+            onPressed: () => _handleSubmit(),
           ),
         ],
       ),

@@ -82,6 +82,8 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
                         final currentUser = Provider.of<AuthService>(context, listen: false).usuario;
                         final usersService = Provider.of<UsersService>(context, listen: false);
                         final usersToAddToGroup = usersService.selectedSearchedUsers;
+                        List newChatRooms = [];
+                        List allChatRooms = chatRoomService.allChatRooms;
                         bool result = await chatRoomService.createChatRoom(
                           currentUser,
                           groupName,
