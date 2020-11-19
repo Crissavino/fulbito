@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
-import 'package:fulbito/globals/mostrar_alerta.dart';
 import 'package:fulbito/models/user.dart';
-import 'package:fulbito/services/chat_room_service.dart';
 import 'package:fulbito/services/users_service.dart';
 import 'package:fulbito/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +14,10 @@ class AddGroupParticipantsScreen extends StatefulWidget {
 class _AddGroupParticipantsScreenState
     extends State<AddGroupParticipantsScreen> {
   UsersService usersService;
-  ChatRoomService chatRoomService;
 
   @override
   void initState() {
     this.usersService = Provider.of<UsersService>(context, listen: false);
-    this.chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
 
     super.initState();
   }
@@ -82,17 +78,10 @@ class _AddGroupParticipantsScreenState
           flexibleSpace: Container(
             decoration: horizontalGradient,
           ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.keyboard_arrow_down,
-              size: 35,
-            ),
-            padding: EdgeInsets.only(top: 4.0),
-            onPressed: () {
-              this.usersService.emptySelectedUsersArray();
-              Navigator.pop(context);
-            },
-          ),
+          leading: leadingArrowDown(context),
+          actions: [
+            _buildMoveForwardIconButton(context),
+          ],
         ),
         body: Container(
           decoration: horizontalGradient,
@@ -115,50 +104,7 @@ class _AddGroupParticipantsScreenState
                     ),
                     child: ClipRRect(
                       borderRadius: screenBorders,
-                      child: SearchPlayerToAddToGroup(),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(15.0),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: RaisedButton(
-                    elevation: 2.0,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onPressed: () async {
-                      // agregar jugadores al grupo y vaciar el arreglo
-                      final bool addPlayersResponse = await this.chatRoomService.addPlayersToGroup(
-                          this.usersService.selectedSearchedUsers,
-                          this.chatRoomService.selectedChatRoom.id
-                      );
-
-                      if(addPlayersResponse) {
-                        this.usersService.emptySelectedUsersArray();
-                        Navigator.pop(context);
-                      } else {
-                        mostrarAlerta(context, 'Ups...',
-                            'Ocurrio un error al agregar los jugadores');
-                      }
-
-                    },
-                    padding: EdgeInsets.all(15.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    color: Colors.white,
-                    child: Text(
-                      'AGREGAR',
-                      style: TextStyle(
-                        color: Colors.green[400],
-                        letterSpacing: 1.5,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'OpenSans',
-                      ),
+                      child: SearchPlayerToAddToNewGroup(),
                     ),
                   ),
                 ),
@@ -166,6 +112,20 @@ class _AddGroupParticipantsScreenState
             ),
           ),
         ));
+  }
+
+  IconButton _buildMoveForwardIconButton(BuildContext context) {
+    UsersService usersService = Provider.of<UsersService>(context);
+    bool thereAreUsersToAdd = usersService.selectedSearchedUsers.isEmpty;
+    return IconButton(
+      icon: Icon(Icons.arrow_forward_ios),
+      color: Colors.white,
+      onPressed: thereAreUsersToAdd
+          ? null
+          : () {
+              Navigator.pushNamed(context, 'create-new-group');
+            },
+    );
   }
 
   Text _buildPageTitle() {

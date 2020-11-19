@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
+import 'package:fulbito/services/auth_service.dart';
+import 'package:fulbito/services/chat_room_service.dart';
+import 'package:fulbito/services/users_service.dart';
 import 'package:fulbito/widgets/widgets.dart';
+import 'package:provider/provider.dart';
 
 import '../container_screen.dart';
 
@@ -74,12 +78,22 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
                     ),
                     onTap: () async {
                       if (_formKey.currentState.validate()) {
+                        final chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+                        final currentUser = Provider.of<AuthService>(context, listen: false).usuario;
+                        final usersService = Provider.of<UsersService>(context, listen: false);
+                        final usersToAddToGroup = usersService.selectedSearchedUsers;
+                        bool result = await chatRoomService.createChatRoom(
+                          currentUser,
+                          groupName,
+                          usersToAddToGroup,
+                        );
                         // TODO crear grupo en el backend y vaciar el selectedSearchedUsers
                         // bool result = await ChatRoomService()
                         //     .createChatRoom(widget.currentUser, groupName,
                         //     widget.usersToAddToGroup);
                         // if created
-                        if (true) {
+                        if (result) {
+                          usersService.emptySelectedUsersArray();
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (_) => ContainerScreen(),

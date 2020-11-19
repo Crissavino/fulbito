@@ -21,6 +21,10 @@ class UsersService with ChangeNotifier {
     notifyListeners();
   }
 
+  emptySelectedUsersArray(){
+    this._selectedSearchedUsers.clear();
+  }
+
   String get termSearched => this._termSearched;
 
   set termSearched(String term) {
@@ -64,6 +68,34 @@ class UsersService with ChangeNotifier {
         id: '8',
         fullName: 'Cris8',
       ),
+      User(
+        id: '9',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '10',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '11',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '12',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '13',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '8',
+        fullName: 'Cris8',
+      ),
+      User(
+        id: '8',
+        fullName: 'Cris8',
+      )
     ];
     return users;
     // final url = '$_url/getAllUsers';

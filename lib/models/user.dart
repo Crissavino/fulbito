@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:fulbito/models/player.dart';
+
 User userModelFromJson(String str) => User.fromJson(json.decode(str));
 
 String userModelToJson(User data) => json.encode(data.toJson());
@@ -13,7 +15,7 @@ class User {
   String imageUrl;
   List<dynamic> chatRooms;
   List<dynamic> devices;
-  dynamic player;
+  Player player;
 
   User({
     this.id,

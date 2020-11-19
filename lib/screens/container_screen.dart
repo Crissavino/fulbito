@@ -7,7 +7,7 @@ import 'package:fulbito/widgets/sections/configuration/configuration_section.dar
 import 'package:fulbito/widgets/sections/matches/matches_section.dart';
 import 'package:fulbito/widgets/sections/play_now/play_now_section.dart';
 
-import 'chats/add_group_participants_screen.dart';
+import 'chats/add_group_participants_to_new_group_screen.dart';
 
 class ContainerScreen extends StatefulWidget {
   @override

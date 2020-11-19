@@ -5,11 +5,13 @@ import 'package:fulbito/models/chat_room.dart';
 import 'package:fulbito/models/device_message.dart';
 import 'package:fulbito/models/message.dart';
 import 'package:fulbito/models/user.dart';
+import 'package:fulbito/screens/chats/add_group_participants_screen.dart';
 import 'package:fulbito/screens/chats/chat_info_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
 import 'package:fulbito/services/socket_service.dart';
 import 'package:fulbito/widgets/sections/chats/chat_message.dart';
+import 'package:fulbito/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -61,7 +63,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
   PopupMenuButton<String> _buildPopupMenu() {
     return PopupMenuButton<String>(
-      offset: Offset(0, 100),
+      offset: Offset(-20, 10),
       onSelected: choiceAction,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -86,15 +88,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
   void choiceAction(String choice) async {
     if (choice == ADD_PLAYER) {
-      // Navigator.push(
-      //   context,
-      //   SlideBottomRoute(
-      //     page: SearchPlayer(
-      //       chatRooom: widget.chatRoom,
-      //       currentUser: widget.currentUser,
-      //     ),
-      //   ),
-      // );
+      await Navigator.push(
+        context,
+        SlideBottomRoute(
+          page: AddGroupParticipantsScreen(),
+        ),
+      );
     } else if (choice == CREATE_GAME) {
       print('Tocaste crear partido');
     }

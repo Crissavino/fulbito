@@ -1,17 +1,17 @@
 part of 'widgets.dart';
 
-class SearchPlayerToAddToNewGroup extends StatefulWidget {
+class SearchPlayerToAddToGroup extends StatefulWidget {
   @override
-  _SearchPlayerToAddToNewGroupState createState() =>
-      _SearchPlayerToAddToNewGroupState();
+  _SearchPlayerToAddToGroupState createState() => _SearchPlayerToAddToGroupState();
 }
 
-class _SearchPlayerToAddToNewGroupState
-    extends State<SearchPlayerToAddToNewGroup> {
+class _SearchPlayerToAddToGroupState extends State<SearchPlayerToAddToGroup> {
+
   AuthService authService;
   UsersService usersService;
   ChatRoomService chatRoomService;
   List<User> usersToAdd;
+  ChatRoom chatRoom;
 
   @override
   void initState() {
@@ -19,6 +19,7 @@ class _SearchPlayerToAddToNewGroupState
     this.usersService = Provider.of<UsersService>(context, listen: false);
     this.chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
     this.usersToAdd = this.usersService.selectedSearchedUsers;
+    this.chatRoom = this.chatRoomService.selectedChatRoom;
 
     super.initState();
   }
@@ -43,16 +44,19 @@ class _SearchPlayerToAddToNewGroupState
           userResults = snapshot.data;
         }
         return ListView.builder(
+          physics: BouncingScrollPhysics(),
           itemCount: userResults.length,
           itemBuilder: (BuildContext context, int index) {
             User user = userResults[index];
-            if (user.id != this.authService.usuario.id) {
-              return PlayerRowToNewGroup(
+            bool isAlreadyInGroup = this.chatRoom.players
+                .where((Player player) => player.user.id == userResults[index].id)
+                .isNotEmpty;
+            if (!isAlreadyInGroup) {
+              return PlayerRowToGroup(
                 userInRow: user,
               );
-            } else {
-              return Container();
             }
+            return Container();
           },
         );
       },

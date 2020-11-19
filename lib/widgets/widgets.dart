@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
+import 'package:fulbito/models/chat_room.dart';
+import 'package:fulbito/models/player.dart';
 import 'package:fulbito/models/user.dart';
 import 'package:fulbito/screens/auth/signin_screen.dart';
 import 'package:fulbito/screens/container_screen.dart';
@@ -12,4 +14,6 @@ import 'package:provider/provider.dart';
 part 'grid_view_added_players.dart';
 part 'splash.dart';
 part 'player_row_to_new_group.dart';
+part 'player_row_to_group.dart';
 part 'search_player_to_add_to_new_group.dart';
+part 'search_player_to_add_to_group.dart';

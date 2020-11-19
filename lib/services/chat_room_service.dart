@@ -6,6 +6,7 @@ import 'package:fulbito/models/chat_room.dart';
 import 'package:fulbito/models/device_message.dart';
 import 'package:fulbito/models/player.dart';
 import 'package:fulbito/models/user.dart';
+import 'package:fulbito/services/users_service.dart';
 import 'package:http/http.dart' as http;
 
 class ChatRoomService with ChangeNotifier {
@@ -158,27 +159,63 @@ class ChatRoomService with ChangeNotifier {
   //   return deviceMessages;
   // }
 
-  // Future<bool> createChatRoom(UserModel currentUser, String groupName,
-  //     List<UserModel> usersToAddToGroup) async {
-  //   final url = '$_url/create?firebaseId=${currentUser.firebaseId}';
+  Future<bool> createChatRoom(User currentUser, String groupName,
+      List<User> usersToAddToGroup) async {
 
-  //   final data = <String, dynamic>{
-  //     'currentUser': currentUser,
-  //     'groupName': groupName,
-  //     'usersToAddToGroup': usersToAddToGroup,
-  //   };
+    // TODO crear el chat room y guardarlo en DB
+    final newChatRoom = ChatRoom(
+      id: '3',
+      name: groupName,
+      players: usersToAddToGroup.map((User user) => user.player).toList()
+    );
 
-  //   final resp = await http.post(url,
-  //       headers: {"Content-Type": "application/json"}, body: json.encode(data));
+    notifyListeners();
 
-  //   final decodedData = json.decode(resp.body);
+    return true;
 
-  //   if (decodedData['success']) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
+    // final url = '$_url/create?firebaseId=${currentUser.firebaseId}';
+    //
+    // final data = <String, dynamic>{
+    //   'currentUser': currentUser,
+    //   'groupName': groupName,
+    //   'usersToAddToGroup': usersToAddToGroup,
+    // };
+    //
+    // final resp = await http.post(url,
+    //     headers: {"Content-Type": "application/json"}, body: json.encode(data));
+    //
+    // final decodedData = json.decode(resp.body);
+    //
+    // if (decodedData['success']) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+  }
+
+  Future<bool> addPlayersToGroup(List<User> users, String chatRoomId) async {
+
+    notifyListeners();
+
+    return true;
+    // final url = '$_url/addToChatRoom?apiKey=$_apiKey';
+    //
+    // final data = <String, dynamic>{'userToAdd': user, 'chatRoomId': chatRoomId};
+    //
+    // final resp = await http.post(
+    //   url,
+    //   headers: {"Content-Type": "application/json"},
+    //   body: json.encode(data),
+    // );
+    //
+    // final decodedData = json.decode(resp.body);
+    //
+    // if (decodedData['success'] != true) return false;
+    //
+    // notifyListeners();
+    //
+    // return true;
+  }
 
   Future<bool> removePlayerFromGroup(User user, String chatRoomId) async {
     final url = '$_url/removeFromChatRoom?apiKey=$_apiKey';
@@ -203,27 +240,27 @@ class ChatRoomService with ChangeNotifier {
     return true;
   }
 
-  Future<bool> addPlayerToGroup(User user, String chatRoomId) async {
-    final url = '$_url/addToChatRoom?apiKey=$_apiKey';
-
-    final data = <String, dynamic>{'userToAdd': user, 'chatRoomId': chatRoomId};
-
-    print(json.encode(data));
-
-    final resp = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(data),
-    );
-
-    final decodedData = json.decode(resp.body);
-
-    if (decodedData['success'] != true) return false;
-
-    notifyListeners();
-
-    return true;
-  }
+  // Future<bool> addPlayerToGroup(User user, String chatRoomId) async {
+  //   final url = '$_url/addToChatRoom?apiKey=$_apiKey';
+  //
+  //   final data = <String, dynamic>{'userToAdd': user, 'chatRoomId': chatRoomId};
+  //
+  //   print(json.encode(data));
+  //
+  //   final resp = await http.post(
+  //     url,
+  //     headers: {"Content-Type": "application/json"},
+  //     body: json.encode(data),
+  //   );
+  //
+  //   final decodedData = json.decode(resp.body);
+  //
+  //   if (decodedData['success'] != true) return false;
+  //
+  //   notifyListeners();
+  //
+  //   return true;
+  // }
 
   Future<dynamic> editGroupName(
       ChatRoom chatRoom, String newChatRoomName) async {
