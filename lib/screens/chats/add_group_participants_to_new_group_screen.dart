@@ -13,16 +13,8 @@ class AddGroupParticipantsScreen extends StatefulWidget {
 
 class _AddGroupParticipantsScreenState
     extends State<AddGroupParticipantsScreen> {
-  UsersService usersService;
 
-  @override
-  void initState() {
-    this.usersService = Provider.of<UsersService>(context, listen: false);
-
-    super.initState();
-  }
-
-  Widget _buildSearchTF() {
+  Widget _buildSearchTF(UsersService usersService) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,7 +52,7 @@ class _AddGroupParticipantsScreenState
                 hintStyle: kHintTextStyle,
               ),
               onChanged: (val) {
-                this.usersService.termSearched = val;
+                usersService.termSearched = val;
               },
             ),
           ),
@@ -71,6 +63,7 @@ class _AddGroupParticipantsScreenState
 
   @override
   Widget build(BuildContext context) {
+    UsersService usersService = Provider.of<UsersService>(context);
     return Scaffold(
         appBar: AppBar(
           title: _buildPageTitle(),
@@ -78,9 +71,19 @@ class _AddGroupParticipantsScreenState
           flexibleSpace: Container(
             decoration: horizontalGradient,
           ),
-          leading: leadingArrowDown(context),
+          leading: IconButton(
+            icon: Icon(
+              Icons.keyboard_arrow_down,
+              size: 35,
+            ),
+            padding: EdgeInsets.only(top: 4.0),
+            onPressed: () {
+              usersService.emptySelectedUsersArray();
+              Navigator.pop(context);
+            },
+          ),
           actions: [
-            _buildMoveForwardIconButton(context),
+            _buildMoveForwardIconButton(context, usersService),
           ],
         ),
         body: Container(
@@ -93,7 +96,7 @@ class _AddGroupParticipantsScreenState
                   margin: EdgeInsets.only(
                     bottom: 20.0,
                   ),
-                  child: _buildSearchTF(),
+                  child: _buildSearchTF(usersService),
                 ),
                 Expanded(
                   child: Container(
@@ -114,8 +117,7 @@ class _AddGroupParticipantsScreenState
         ));
   }
 
-  IconButton _buildMoveForwardIconButton(BuildContext context) {
-    UsersService usersService = Provider.of<UsersService>(context);
+  IconButton _buildMoveForwardIconButton(BuildContext context, usersService) {
     bool thereAreUsersToAdd = usersService.selectedSearchedUsers.isEmpty;
     return IconButton(
       icon: Icon(Icons.arrow_forward_ios),
