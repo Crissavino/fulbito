@@ -15,6 +15,30 @@ class RecentChats extends StatefulWidget {
 
 class _RecentChatsState extends State<RecentChats> {
   // MessageBloc messageBloc = MessageBloc();
+  ChatRoomService _chatRoomService;
+  List<ChatRoom> _allChatRooms;
+  AuthService _authService;
+  User _currentUser;
+  bool loading;
+
+  @override
+  void initState() {
+    this._chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+    this._authService = Provider.of<AuthService>(context, listen: false);
+    this._currentUser = this._authService.usuario;
+    _loadChatRooms();
+
+    super.initState();
+  }
+
+  void _loadChatRooms() async {
+    this.loading = true;
+    this._chatRoomService.allChatRooms = await this._chatRoomService.getAllMyChatRooms(this._currentUser.id);
+    this._allChatRooms = this._chatRoomService.allChatRooms;
+    setState(() {
+      this.loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,35 +50,22 @@ class _RecentChatsState extends State<RecentChats> {
         ),
         child: ClipRRect(
           borderRadius: screenBorders,
-          child: _buildChatRoomList(),
+          child: this.loading
+            ? Center(
+              child: circularLoading,
+            )
+            : _buildChatRoomList(),
         ),
       ),
     );
   }
 
   _buildChatRoomList() {
-    final ChatRoomService _chatRoomService =
-        Provider.of<ChatRoomService>(context);
-    final User currentUser = Provider.of<AuthService>(context).usuario;
-    return FutureBuilder(
-      future: _chatRoomService.getAllMyChatRooms(currentUser.firebaseId),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<ChatRoom>> futureChatRooms) {
-        if (futureChatRooms.hasData) {
-          final List<ChatRoom> chats = futureChatRooms.data;
-
-          return ListView.builder(
-            itemCount: (chats != null) ? chats.length : 0,
-            itemBuilder: (BuildContext context, int index) {
-              final ChatRoom chat = chats[index];
-              return _buildChatRoomRow(context, chat, _chatRoomService);
-            },
-          );
-        } else {
-          return Center(
-            child: circularLoading,
-          );
-        }
+    return ListView.builder(
+      itemCount: (this._allChatRooms != null) ? this._allChatRooms.length : 0,
+      itemBuilder: (BuildContext context, int index) {
+        final ChatRoom chat = this._allChatRooms[index];
+        return _buildChatRoomRow(context, chat, _chatRoomService);
       },
     );
   }

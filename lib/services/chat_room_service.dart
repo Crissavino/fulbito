@@ -6,17 +6,28 @@ import 'package:fulbito/models/chat_room.dart';
 import 'package:fulbito/models/device_message.dart';
 import 'package:fulbito/models/player.dart';
 import 'package:fulbito/models/user.dart';
+import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/users_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class ChatRoomService with ChangeNotifier {
   final String _url = '$NGROK_HTTP/api/chatRooms';
   String _apiKey = 'cdf773c21cdd290fabe0618a20e4f181';
   ChatRoom _selectedChatRoom;
+  List<ChatRoom> _allChatRooms = [];
+  AuthService _authService = AuthService();
 
   ChatRoom get selectedChatRoom => this._selectedChatRoom;
   set selectedChatRoom(ChatRoom chatRoom) {
     this._selectedChatRoom = chatRoom;
+    notifyListeners();
+  }
+
+  List<ChatRoom> get allChatRooms => this._allChatRooms;
+  set allChatRooms(List<ChatRoom> chatRooms) {
+    this._allChatRooms.clear();
+    this._allChatRooms = chatRooms;
     notifyListeners();
   }
 
