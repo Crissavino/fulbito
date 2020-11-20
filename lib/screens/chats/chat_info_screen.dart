@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
+import 'package:fulbito/models/player.dart';
+import 'package:fulbito/models/user.dart';
 import 'package:fulbito/services/chat_room_service.dart';
 import 'package:fulbito/widgets/edit_text.dart';
 import 'package:image_picker/image_picker.dart';
@@ -224,8 +226,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return InkWell(
-            onTap: () =>
-                print('Accions con el usuario ${players[index].user.fullName}'),
+            onTap: () => _settingModalBottomSheet(players[index], context),
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -253,6 +254,49 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
         childCount: players.length,
       ),
     );
+  }
+
+  void _settingModalBottomSheet(Player player, BuildContext context) {
+    final User user = player.user;
+
+    // cambiar de acuerdo a si es iPhone o Android
+
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            padding: EdgeInsets.only(bottom: 30.0),
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                  leading: new Icon(Icons.admin_panel_settings),
+                  title: new Text('Hacer administrador'),
+                  onTap: () async {
+                    print('Hacer Admin');
+                    await Future.delayed(Duration(milliseconds: 200));
+                    Navigator.pop(context);
+                  },
+                ),
+                new ListTile(
+                  leading: new Icon(Icons.remove_circle),
+                  title: new Text('Eliminar del grupo'),
+                  onTap: () async {
+                    print('Eliminar del grupo');
+                    // chatRoomBloc.removePlayerFromGroup(
+                    //     user, widget.chatRoom.id);
+                    //
+                    // setState(() {
+                    //   chatRoomBloc.playerToRemoveStream(player);
+                    // });
+
+                    await Future.delayed(Duration(milliseconds: 200));
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   Widget _buildLeaveGroup() {
