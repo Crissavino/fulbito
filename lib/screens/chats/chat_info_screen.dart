@@ -102,8 +102,9 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
       elevation: 2.0,
       backgroundColor: Colors.green[400],
       expandedHeight: 200.0,
-      floating: false,
+      floating: true,
       pinned: true,
+      stretch: true,
       flexibleSpace: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
         // print('constraints=' + constraints.toString());

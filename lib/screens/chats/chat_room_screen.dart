@@ -40,7 +40,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     this._authService = Provider.of<AuthService>(context, listen: false);
     this._chatRoomService =
         Provider.of<ChatRoomService>(context, listen: false);
+
     this.socketService = Provider.of<SocketService>(context, listen: false);
+    this.socketService.socket.on('mensaje-personal', _escucharMensaje);
+
     this.chatRoom = this._chatRoomService.selectedChatRoom;
     this.currentUser = this._authService.usuario;
     _textController.addListener(_getLatestValue);
@@ -56,6 +59,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     _textController.dispose();
     // Clean up the controller when the widget is removed from the
     // widget tree.
+    this.socketService.socket.off('mensaje-personal');
     super.dispose();
   }
 
@@ -148,7 +152,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       ? Center(
                           child: circularLoading,
                         )
-                      : _buldMessagesScreen(),
+                      : _buildMessagesScreen(),
                 ),
               ),
             ),
@@ -176,9 +180,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // desp de insertar el mensaje disparo la animacion
     newMessage.animationController.forward();
 
-    this._focusNode.requestFocus();
-    this._textController.clear();
-
     // final message = Message();
     // message.sender = this.currentUser;
     // message.time = DateTime.now().toIso8601String();
@@ -187,11 +188,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // message.unread = false;
     // message.language = 'es';
     // message.chatRoom = this.chatRoom;
-    // this.socketService.socket.emit('mensaje-personal', {
-    //   'de': this.authService.usuario.uuid,
-    //   'para': this.chatService.usuarioPara.uuid,
-    //   'mensaje': texto
-    // });
+    this.socketService.socket.emit('mensaje-personal', {
+      'de': this.currentUser,
+      'para': this.chatRoom,
+      'text': this.textMessage
+    });
+
+    this._focusNode.requestFocus();
+    this._textController.clear();
   }
 
   Widget _buildMessageComposer() {
@@ -215,8 +219,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               controller: _textController,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration.collapsed(
-                hintText: 'Send a message...',
+                hintText: 'Enviar mensaje...',
               ),
+              focusNode: _focusNode,
             ),
           ),
           Platform.isIOS
@@ -266,7 +271,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     });
   }
 
-  Widget _buldMessagesScreen() {
+  Widget _buildMessagesScreen() {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: ListView.builder(
@@ -277,5 +282,25 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
           // _buildItem(_messages[index], currentUser),
           ),
     );
+  }
+
+  void _escucharMensaje(dynamic payload) {
+    print(payload);
+    // ChatMessage message = ChatMessage(
+    //   texto: payload['mensaje'],
+    //   uuid: payload['de'],
+    //   animationController: AnimationController(
+    //     vsync: this,
+    //     duration: Duration(
+    //       milliseconds: 400,
+    //     ),
+    //   ),
+    // );
+    //
+    // setState(() {
+    //   _messages.insert(0, message);
+    // });
+    //
+    // message.animationController.forward();
   }
 }
