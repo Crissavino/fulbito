@@ -15,7 +15,7 @@ class ChatRoom {
   bool unreadMessages;
   dynamic team;
   List<dynamic> messages;
-  List<Player> players;
+  List<dynamic> players;
   dynamic lastMessage;
   String image;
   dynamic owner;

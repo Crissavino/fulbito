@@ -24,9 +24,9 @@ class MatchesSection extends StatelessWidget {
 
   FutureBuilder<List<ChatRoom>> _buildMatchesList(BuildContext context) {
     final ChatRoomService _chatRoomService = ChatRoomService();
-    final User currentUser = Provider.of<AuthService>(context).usuario;
+    final User currentUser = Provider.of<AuthService>(context).user;
     return FutureBuilder(
-      future: _chatRoomService.getAllMyChatRooms(currentUser.firebaseId),
+      future: _chatRoomService.getAllMyChatRooms(currentUser.id),
       builder: (context, futureChats) {
         if (futureChats.hasData) {
           final List<ChatRoom> chats = futureChats.data;

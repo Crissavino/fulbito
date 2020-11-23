@@ -6,33 +6,34 @@ import 'dart:convert';
 
 import 'package:fulbito/models/user.dart';
 
-RegisterResponse registerResponseFromJson(String str) =>
-    RegisterResponse.fromJson(json.decode(str));
+RegisterResponse registerResponseFromJson(String str) => RegisterResponse.fromJson(json.decode(str));
 
-String registerResponseToJson(RegisterResponse data) =>
-    json.encode(data.toJson());
+String registerResponseToJson(RegisterResponse data) => json.encode(data.toJson());
 
 class RegisterResponse {
   RegisterResponse({
-    this.ok,
-    this.usuario,
+    this.success,
+    this.message,
+    this.user,
     this.token,
   });
 
-  bool ok;
-  User usuario;
+  bool success;
+  String message;
+  User user;
   String token;
 
-  factory RegisterResponse.fromJson(Map<String, dynamic> json) =>
-      RegisterResponse(
-        ok: json["ok"],
-        usuario: User.fromJson(json["usuario"]),
-        token: json["token"],
-      );
+  factory RegisterResponse.fromJson(Map<String, dynamic> json) => RegisterResponse(
+    success: json["success"],
+    message: json["message"],
+    user: User.fromJson(json["user"]),
+    token: json["token"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "ok": ok,
-        "usuario": usuario.toJson(),
-        "token": token,
-      };
+    "success": success,
+    "message": message,
+    "user": user.toJson(),
+    "token": token,
+  };
 }

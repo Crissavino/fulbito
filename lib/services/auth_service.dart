@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fulbito/globals/environment.dart';
 import 'package:fulbito/models/login_response.dart';
 import 'package:fulbito/models/register_response.dart';
@@ -10,14 +13,16 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService with ChangeNotifier {
-  User usuario;
-  bool _autenticando = false;
+  User user;
+  bool _authenticating = false;
+
   // Create storage
   final _storage = new FlutterSecureStorage();
 
-  bool get autenticando => this._autenticando;
-  set autenticando(bool valor) {
-    this._autenticando = valor;
+  bool get authenticating => this._authenticating;
+
+  set authenticating(bool valor) {
+    this._authenticating = valor;
     notifyListeners();
   }
 
@@ -34,57 +39,67 @@ class AuthService with ChangeNotifier {
   }
 
   Future<bool> login(String email, String pass) async {
-    this.autenticando = true;
+    this.authenticating = true;
 
     final data = {"email": email, "password": pass};
 
     final resp = await http.post(
-      '${Environment.apiUrl}/login',
+      '${Environment.apiUrl}/auth',
       body: jsonEncode(data),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (resp.statusCode == 200) {
-      this.autenticando = false;
+      this.authenticating = false;
       final loginResponse = loginResponseFromJson(resp.body);
-      this.usuario = loginResponse.usuario;
-
+      this.user = loginResponse.usuario;
       await this._guardarToken(loginResponse.token);
 
       return true;
     } else {
-      this.autenticando = false;
+      this.authenticating = false;
       return false;
     }
   }
 
-  Future register(String nombre, String email, String pass) async {
-    this.autenticando = true;
+  Future register(String fullName, String email, String pass) async {
+    this.authenticating = true;
+
+    final List<String> deviceInformation = await getDeviceDetails();
 
     final data = {
-      "nombre": nombre,
+      "fullName": fullName,
       "email": email,
       "password": pass,
+      "type": Platform.isIOS ? 'ios' : 'android',
+      "language": Platform.localeName,
+      "deviceId": deviceInformation[2]
     };
 
+
     final resp = await http.post(
-      '${Environment.apiUrl}/login/new',
+      '${Environment.apiUrl}/auth/create',
       body: jsonEncode(data),
       headers: {
         'Content-Type': 'application/json',
       },
     );
 
-    if (resp.statusCode == 200) {
-      this.autenticando = false;
-      final registerResponse = registerResponseFromJson(resp.body);
-      this.usuario = registerResponse.usuario;
+    final Map<String, dynamic> decodedData = json.decode(resp.body);
 
+    if (resp.statusCode == 200) {
+      this.authenticating = false;
+      if (decodedData['success'] == false) {
+        this.authenticating = false;
+        return false;
+      }
+      final registerResponse = registerResponseFromJson(resp.body);
+      this.user = registerResponse.user;
       await this._guardarToken(registerResponse.token);
 
       return true;
     } else {
-      this.autenticando = false;
+      this.authenticating = false;
       return false;
     }
   }
@@ -95,16 +110,20 @@ class AuthService with ChangeNotifier {
     if (token == null) return false;
 
     final resp = await http.get(
-      '${Environment.apiUrl}/login/renewToken',
+      '${Environment.apiUrl}/auth/renewToken',
       headers: {
         'Content-Type': 'application/json',
         'x-token': token,
       },
     );
 
+    final Map<String, dynamic> decodedData = json.decode(resp.body);
+
     if (resp.statusCode == 200) {
+
       final renewTokenResponse = renewTokenResponseFromJson(resp.body);
-      this.usuario = renewTokenResponse.usuario;
+      // TODO controlar porque no lo procesa
+      this.user = renewTokenResponse.user;
 
       await this._guardarToken(renewTokenResponse.token);
       return true;
@@ -122,5 +141,30 @@ class AuthService with ChangeNotifier {
   Future logout() async {
     // Delete value
     await _storage.delete(key: 'token');
+  }
+
+  static Future<List<String>> getDeviceDetails() async {
+    String deviceName;
+    String deviceVersion;
+    String identifier;
+    final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo build = await deviceInfoPlugin.androidInfo;
+        deviceName = build.model;
+        identifier = build.androidId; //UUID for Android
+        deviceVersion = build.version.toString();
+      } else if (Platform.isIOS) {
+        final IosDeviceInfo data = await deviceInfoPlugin.iosInfo;
+        deviceName = data.name;
+        identifier = data.identifierForVendor; //UUID for iOS
+        deviceVersion = data.systemVersion;
+      }
+    } on PlatformException {
+      print('Failed to get platform version');
+    }
+
+    //if (!mounted) return;
+    return [deviceName, deviceVersion, identifier];
   }
 }

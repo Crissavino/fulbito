@@ -49,7 +49,7 @@ class _SearchPlayerToAddToGroupState extends State<SearchPlayerToAddToGroup> {
           itemBuilder: (BuildContext context, int index) {
             User user = userResults[index];
             bool isAlreadyInGroup = this.chatRoom.players
-                .where((Player player) => player.user.id == userResults[index].id)
+                .where((player) => player['user']['id'] == userResults[index].id)
                 .isNotEmpty;
             if (!isAlreadyInGroup) {
               return PlayerRowToGroup(

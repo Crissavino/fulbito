@@ -38,6 +38,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
   @override
   void initState() {
     this._authService = Provider.of<AuthService>(context, listen: false);
+    this.currentUser = this._authService.user;
     this._chatRoomService =
         Provider.of<ChatRoomService>(context, listen: false);
 
@@ -45,7 +46,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     this.socketService.socket.on('mensaje-personal', _escucharMensaje);
 
     this.chatRoom = this._chatRoomService.selectedChatRoom;
-    this.currentUser = this._authService.usuario;
     _textController.addListener(_getLatestValue);
     _cargarHistorial();
     super.initState();
@@ -169,7 +169,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     }
 
     final newMessage = ChatMessage(
-      texto: this.textMessage,
+      text: this.textMessage,
       sender: this.currentUser,
       animationController: AnimationController(
         vsync: this,
@@ -248,13 +248,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
   void _cargarHistorial() async {
     this.isLoading = true;
-
     List<DeviceMessage> myMessages = await this
         ._chatRoomService
         .getAllMyChatRoomMessages(this.chatRoom.id, this.currentUser.id);
     final history = myMessages.map(
       (m) => ChatMessage(
-        texto: m.text,
+        text: m.text,
         sender: m.sender,
         animationController: AnimationController(
           vsync: this,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
 import 'package:fulbito/models/chat_room.dart';
+import 'package:fulbito/models/player.dart';
 import 'package:fulbito/models/user.dart';
 import 'package:fulbito/screens/chats/chat_room_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
@@ -25,7 +26,7 @@ class _RecentChatsState extends State<RecentChats> {
   void initState() {
     this._chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
     this._authService = Provider.of<AuthService>(context, listen: false);
-    this._currentUser = this._authService.usuario;
+    this._currentUser = this._authService.user;
     _loadChatRooms();
 
     super.initState();
@@ -61,13 +62,33 @@ class _RecentChatsState extends State<RecentChats> {
   }
 
   _buildChatRoomList() {
-    return ListView.builder(
-      itemCount: (this._allChatRooms != null) ? this._allChatRooms.length : 0,
-      itemBuilder: (BuildContext context, int index) {
-        final ChatRoom chat = this._allChatRooms[index];
-        return _buildChatRoomRow(context, chat, _chatRoomService);
-      },
-    );
+    if(this._allChatRooms.isEmpty){
+
+      return Container(
+          margin: EdgeInsets.all(10.0),
+          alignment: Alignment.center,
+          width: double.infinity,
+          child: Text(
+            'Todavia no tienes ningun chat',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18.0,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'OpenSans',
+            ),
+          )
+      );
+
+    } else {
+      return ListView.builder(
+        itemCount: (this._allChatRooms != null) ? this._allChatRooms.length : 0,
+        itemBuilder: (BuildContext context, int index) {
+          final ChatRoom chat = this._allChatRooms[index];
+          return _buildChatRoomRow(context, chat, _chatRoomService);
+        },
+      );
+    }
+
   }
 
   GestureDetector _buildChatRoomRow(

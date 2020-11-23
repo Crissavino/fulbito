@@ -4,13 +4,13 @@ import 'package:fulbito/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
-  final String texto;
-  final User sender;
+  final String text;
+  final dynamic sender;
   final AnimationController animationController;
 
   const ChatMessage({
     Key key,
-    @required this.texto,
+    @required this.text,
     @required this.sender,
     @required this.animationController,
   }) : super(key: key);
@@ -18,8 +18,8 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
-    final User currentUser = authService.usuario;
-    currentUser.id = '1';
+    final User currentUser = authService.user;
+    final User user = User.fromJson(this.sender);
     return FadeTransition(
       opacity: animationController,
       child: SizeTransition(
@@ -28,9 +28,9 @@ class ChatMessage extends StatelessWidget {
           curve: Curves.elasticOut,
         ),
         child: Container(
-          child: this.sender.id == currentUser.id
+          child: user.id == currentUser.id
               ? _myMessage(context, currentUser)
-              : _notMyMessage(context, this.sender),
+              : _notMyMessage(context, user),
           // : _notMyMessage(context, sender),
         ),
       ),
@@ -83,7 +83,7 @@ class ChatMessage extends StatelessWidget {
           ),
           SizedBox(height: 8.0),
           Text(
-            this.texto,
+            this.text,
             style: TextStyle(
               color: Colors.blueGrey,
               fontSize: 16.0,
@@ -140,7 +140,7 @@ class ChatMessage extends StatelessWidget {
           ),
           SizedBox(height: 8.0),
           Text(
-            this.texto,
+            this.text,
             style: TextStyle(
               color: Colors.blueGrey,
               fontSize: 16.0,

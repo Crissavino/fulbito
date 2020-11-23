@@ -161,7 +161,7 @@ class _SigninScreenState extends State<SigninScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: _authService.autenticando
+        onPressed: _authService.authenticating
             ? null
             : () async {
                 if (_formKey.currentState.validate()) {

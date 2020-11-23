@@ -46,7 +46,7 @@ class _SearchPlayerToAddToNewGroupState
           itemCount: userResults.length,
           itemBuilder: (BuildContext context, int index) {
             User user = userResults[index];
-            if (user.id != this.authService.usuario.id) {
+            if (user.id != this.authService.user.id) {
               return PlayerRowToNewGroup(
                 userInRow: user,
               );

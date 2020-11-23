@@ -15,24 +15,25 @@ String renewTokenResponseToJson(RenewTokenResponse data) =>
 class RenewTokenResponse {
   RenewTokenResponse({
     this.ok,
-    this.usuario,
+    this.user,
     this.token,
   });
 
   bool ok;
-  User usuario;
+  User user;
   String token;
 
-  factory RenewTokenResponse.fromJson(Map<String, dynamic> json) =>
-      RenewTokenResponse(
-        ok: json["ok"],
-        usuario: User.fromJson(json["usuario"]),
-        token: json["token"],
-      );
+  factory RenewTokenResponse.fromJson(Map<String, dynamic> json) {
+    return RenewTokenResponse(
+          ok: json["ok"],
+          user: User.fromJson(json["user"]),
+          token: json["token"],
+        );
+  }
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
-        "usuario": usuario.toJson(),
+        "user": user.toJson(),
         "token": token,
       };
 }

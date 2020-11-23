@@ -225,8 +225,9 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
+          User user = User.fromJson(players[index]['user']);
           return InkWell(
-            onTap: () => _settingModalBottomSheet(players[index], context),
+            onTap: () => _settingModalBottomSheet(Player.fromJson(players[index]), context),
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -235,13 +236,13 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                     width: 20.0,
                   ),
                   CircleAvatar(
-                    child: Text(players[index].user.fullName[0]),
+                    child: Text(user.fullName[0]),
                   ),
                   SizedBox(
                     width: 20.0,
                   ),
                   Text(
-                    players[index].user.fullName,
+                    user.fullName,
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -257,7 +258,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   }
 
   void _settingModalBottomSheet(Player player, BuildContext context) {
-    final User user = player.user;
+    final User user = User.fromJson(player.user);
 
     // cambiar de acuerdo a si es iPhone o Android
 

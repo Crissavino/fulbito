@@ -11,7 +11,7 @@ String deviceMessageModelToJson(DeviceMessage data) =>
 
 class DeviceMessage {
   String id;
-  User sender;
+  dynamic sender;
   dynamic messagePlayer;
   dynamic device;
   dynamic chatRoom;

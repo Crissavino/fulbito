@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
+import 'package:fulbito/globals/environment.dart';
 import 'package:fulbito/models/chat_room.dart';
 import 'package:fulbito/models/device_message.dart';
 import 'package:fulbito/models/player.dart';
@@ -26,122 +27,111 @@ class ChatRoomService with ChangeNotifier {
 
   List<ChatRoom> get allChatRooms => this._allChatRooms;
   set allChatRooms(List<ChatRoom> chatRooms) {
-    this._allChatRooms.clear();
     this._allChatRooms = chatRooms;
     notifyListeners();
+  }
+
+  Future<dynamic> createChatRoom(User currentUser, String groupName,
+      List<User> usersToAddToGroup) async {
+
+    try {
+      final data = <String, dynamic>{
+        'currentUser': currentUser,
+        'groupName': groupName,
+        'usersToAddToGroup': usersToAddToGroup,
+      };
+
+      final resp = await http.post(
+          '${Environment.apiUrl}/chatRooms/create',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-token': await AuthService.getToken()
+          },
+          body: json.encode(data)
+      );
+
+      final decodedData = json.decode(resp.body);
+
+      if (decodedData['success']) {
+
+        List<ChatRoom> newChatRooms = [];
+        newChatRooms.addAll(this._allChatRooms);
+        newChatRooms.add(ChatRoom.fromJson(decodedData['chatRoom']));
+
+        this._allChatRooms = newChatRooms;
+
+        return decodedData;
+
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<List<ChatRoom>> getAllMyChatRooms(
     String userId,
   ) async {
-    await Future.delayed(Duration(seconds: 1));
-    Map<String, dynamic> lastMessage = {
-      'text': 'Mensaje de prueba',
-    };
-    List<Player> players = [
-      Player(
-        user: User(id: '1', fullName: 'Cris1 Saivino'),
-      ),
-      Player(
-        user: User(id: '2', fullName: 'Cris2 Saivino'),
-      ),
-      Player(
-        user: User(id: '3', fullName: 'Cris3 Saivino'),
-      ),
-      Player(
-        user: User(id: '4', fullName: 'Cris4 Saivino'),
-      ),
-    ];
+    try {
+      final resp = await http.get(
+          '${Environment.apiUrl}/chatRooms/getAllMyChatRooms?userId=$userId',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-token': await AuthService.getToken()
+          }
+      );
 
-    return [
-      ChatRoom(
-        name: 'Probando',
-        unreadMessages: true,
-        lastMessage: lastMessage,
-        description: 'Esta es una descripcion de prueba1',
-        players: players,
-      ),
-      ChatRoom(
-        name: 'Probando 2',
-        unreadMessages: false,
-        lastMessage: lastMessage,
-        description: 'Esta es una descripcion de prueba2',
-        players: players,
-      ),
-    ];
-    //RECUPERAR EL BACKEND DEL PENDRIVE
-    // final url = '$_url/getAllMyChatRooms?firebaseId=$firebaseId';
-    // final resp = await http.get(url);
-    // final Map<String, dynamic> decodedData = json.decode(resp.body);
+      final Map<String, dynamic> decodedData = json.decode(resp.body);
 
-    // if (decodedData == null) return [];
-    // if (decodedData['error'] != null) return [];
+      if (decodedData == null) return [];
+      if (decodedData['error'] != null) return [];
 
-    // final chatRoomsFromNode = decodedData['chatRooms'];
-    // List<ChatRoom> chatRooms = List();
+      final chatRoomsFromNode = decodedData['chatRooms'];
+      List<ChatRoom> chatRooms = List();
 
-    // chatRoomsFromNode.forEach((value) {
-    //   final chatRoom = ChatRoom.fromJson(value);
-    //   chatRooms.add(chatRoom);
-    // });
-    // return chatRooms;
+      chatRoomsFromNode.forEach((value) {
+        final chatRoom = ChatRoom.fromJson(value);
+        chatRooms.add(chatRoom);
+      });
+
+      return chatRooms;
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 
   Future<List<DeviceMessage>> getAllMyChatRoomMessages(
     String chatRoomId,
     String userId,
   ) async {
-    await Future.delayed(Duration(seconds: 1));
+    try {
+      final resp = await http.get(
+          '${Environment.apiUrl}/chatRooms/getAllMyChatRoomMessage?userId=$userId&chatRoomId=$chatRoomId',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-token': await AuthService.getToken()
+          }
+      );
 
-    return <DeviceMessage>[
-      DeviceMessage(
-          id: '1',
-          sender: User(id: '1', fullName: 'Cris1 Saivino'),
-          text: 'Pruebaaaa1'),
-      DeviceMessage(
-          id: '2',
-          sender: User(id: '2', fullName: 'Cris2 Saivino'),
-          text: 'Pruebaaaa2'),
-      DeviceMessage(
-          id: '3',
-          sender: User(id: '3', fullName: 'Cris3 Saivino'),
-          text: 'Pruebaaaa3'),
-      DeviceMessage(
-          id: '4',
-          sender: User(id: '1', fullName: 'Cris1 Saivino'),
-          text:
-              'Pruebaaaa4Pruebaaaa4Pruebaaaa4Pruebaaaa4Pruebaaaa4Pruebaaaa4Pruebaaaa4'),
-      DeviceMessage(
-          id: '5',
-          sender: User(id: '2', fullName: 'Cris2 Saivino'),
-          text: 'Pruebaaaa5'),
-      DeviceMessage(
-          id: '6',
-          sender: User(id: '7', fullName: 'Cris7 Saivino'),
-          text: 'Pruebaaaa6'),
-      DeviceMessage(
-          id: '7',
-          sender: User(id: '1', fullName: 'Cris1 Saivino'),
-          text: 'Pruebaaaa7'),
-    ];
-    //RECUPERAR EL BACKEND DEL PENDRIVE
-    // final url =
-    //     '$_url/getAllMyChatRoomMessage?userId=$userId&chatRoomId=$chatRoomId';
-    // final resp = await http.get(url);
+      final Map<String, dynamic> decodedData = json.decode(resp.body);
+      if (decodedData == null) return [];
+      if (decodedData['error'] != null) return [];
 
-    // final Map<String, dynamic> decodedData = json.decode(resp.body);
+      final chatRoomMessagesFromNode = decodedData['deviceMessages'];
+      List<DeviceMessage> messages = List();
+      chatRoomMessagesFromNode.forEach((value) {
+        final message = DeviceMessage.fromJson(value);
+        messages.add(message);
+      });
 
-    // if (decodedData == null) return [];
-    // if (decodedData['error'] != null) return [];
+      return messages;
 
-    // final chatRoomMessagesFromNode = decodedData['deviceMessages'];
-    // List<DeviceMessageModel> messages = List();
-    // chatRoomMessagesFromNode.forEach((value) {
-    //   final message = DeviceMessageModel.fromJson(value);
-    //   messages.add(message);
-    // });
-
-    // return messages;
+    } catch (e) {
+      return [];
+    }
   }
 
   // Future<List<DeviceMessageModel>> newMessage(
@@ -169,45 +159,6 @@ class ChatRoomService with ChangeNotifier {
 
   //   return deviceMessages;
   // }
-
-  Future<bool> createChatRoom(User currentUser, String groupName,
-      List<User> usersToAddToGroup) async {
-
-    // TODO crear el chat room y guardarlo en DB
-    final newChatRoom = ChatRoom(
-      id: '3',
-      name: groupName,
-      players: usersToAddToGroup.map((User user) => user.player).toList()
-    );
-
-    // List<ChatRoom> newChatRooms = [];
-    // newChatRooms.add(newChatRoom);
-    // newChatRooms.addAll(this._allChatRooms);
-    // this._allChatRooms = newChatRooms;
-    //
-    // print(this._allChatRooms);
-
-    return true;
-
-    // final url = '$_url/create?firebaseId=${currentUser.firebaseId}';
-    //
-    // final data = <String, dynamic>{
-    //   'currentUser': currentUser,
-    //   'groupName': groupName,
-    //   'usersToAddToGroup': usersToAddToGroup,
-    // };
-    //
-    // final resp = await http.post(url,
-    //     headers: {"Content-Type": "application/json"}, body: json.encode(data));
-    //
-    // final decodedData = json.decode(resp.body);
-    //
-    // if (decodedData['success']) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
-  }
 
   Future<bool> addPlayersToGroup(List<User> users, String chatRoomId) async {
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
+import 'package:fulbito/globals/mostrar_alerta.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
 import 'package:fulbito/services/users_service.dart';
@@ -17,6 +18,7 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
   final _formKey = GlobalKey<FormState>();
   String error = '';
   String groupName = '';
+  bool isLoading = false;
 
   Widget _buildGroupNameTF() {
     return Column(
@@ -79,22 +81,25 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
                     onTap: () async {
                       if (_formKey.currentState.validate()) {
                         final chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
-                        final currentUser = Provider.of<AuthService>(context, listen: false).usuario;
+                        final currentUser = Provider.of<AuthService>(context, listen: false).user;
                         final usersService = Provider.of<UsersService>(context, listen: false);
                         final usersToAddToGroup = usersService.selectedSearchedUsers;
-                        List newChatRooms = [];
-                        List allChatRooms = chatRoomService.allChatRooms;
-                        bool result = await chatRoomService.createChatRoom(
+
+                        setState(() {
+                          this.isLoading = true;
+                        });
+
+                        dynamic createChatRoomResponse = await chatRoomService.createChatRoom(
                           currentUser,
                           groupName,
                           usersToAddToGroup,
                         );
-                        // TODO crear grupo en el backend y vaciar el selectedSearchedUsers
-                        // bool result = await ChatRoomService()
-                        //     .createChatRoom(widget.currentUser, groupName,
-                        //     widget.usersToAddToGroup);
-                        // if created
-                        if (result) {
+
+                        setState(() {
+                          this.isLoading = false;
+                        });
+
+                        if (createChatRoomResponse['success'] == true) {
                           usersService.emptySelectedUsersArray();
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
@@ -103,7 +108,8 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
                                   (route) => false);
                         } else {
                           // if not created
-                          // print('mostrar error');
+                          mostrarAlerta(context, 'Ups...',
+                              createChatRoomResponse['message']);
                         }
                       }
                     },
@@ -126,7 +132,15 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
               child: Container(
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
-                  child: Column(
+                  child: this.isLoading
+                      ? Container(
+                        alignment: Alignment.center,
+                        height: 500.0,
+                        child: Center(
+                          child: circularLoading,
+                        ),
+                      )
+                      : Column(
                     children: [
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
