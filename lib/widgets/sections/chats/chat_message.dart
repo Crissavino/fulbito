@@ -19,7 +19,8 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     final User currentUser = authService.user;
-    final User user = User.fromJson(this.sender);
+    final userId = this.sender is User ? this.sender.id : this.sender['id'];
+
     return FadeTransition(
       opacity: animationController,
       child: SizeTransition(
@@ -28,9 +29,9 @@ class ChatMessage extends StatelessWidget {
           curve: Curves.elasticOut,
         ),
         child: Container(
-          child: user.id == currentUser.id
+          child: userId == currentUser.id
               ? _myMessage(context, currentUser)
-              : _notMyMessage(context, user),
+              : _notMyMessage(context, this.sender),
           // : _notMyMessage(context, sender),
         ),
       ),
@@ -95,7 +96,8 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  Widget _notMyMessage(BuildContext context, User senderUser) {
+  Widget _notMyMessage(BuildContext context, dynamic senderUser) {
+    final userFullName = senderUser is User ? senderUser.fullName : senderUser['fullName'];
     return Container(
       margin: EdgeInsets.only(
         top: 8.0,
@@ -117,7 +119,7 @@ class ChatMessage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                senderUser.fullName,
+                userFullName,
                 // message.time.toString(),
                 style: TextStyle(
                   color: Colors.blueGrey,

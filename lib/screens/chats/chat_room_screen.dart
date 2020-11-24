@@ -122,44 +122,56 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: horizontalGradient,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        // backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-          title: _openChatInfo(context, _chatRoomService.selectedChatRoom),
-          elevation: 0.0,
-          leading: leadingArrowDown(context),
-          flexibleSpace: Container(
-            decoration: horizontalGradient,
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white
           ),
-          actions: <Widget>[
-            _buildPopupMenu(),
-          ],
         ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: screenBorders,
+        SafeArea(
+          top: false,
+          child: Container(
+            decoration: horizontalGradient,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              // backgroundColor: Theme.of(context).primaryColor,
+              appBar: AppBar(
+                title: _openChatInfo(context, _chatRoomService.selectedChatRoom),
+                elevation: 0.0,
+                leading: leadingArrowDown(context),
+                flexibleSpace: Container(
+                  decoration: horizontalGradient,
                 ),
-                child: ClipRRect(
-                  borderRadius: screenBorders,
-                  child: (this.isLoading)
-                      ? Center(
+                actions: <Widget>[
+                  _buildPopupMenu(),
+                ],
+              ),
+              body: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: screenBorders,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: screenBorders,
+                        child: (this.isLoading)
+                            ? Center(
                           child: circularLoading,
                         )
-                      : _buildMessagesScreen(),
-                ),
+                            : _buildMessagesScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMessageComposer(),
+                ],
               ),
             ),
-            _buildMessageComposer(),
-          ],
-        ),
-      ),
+          ),
+          ),
+      ],
     );
   }
 
