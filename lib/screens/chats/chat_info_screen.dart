@@ -44,7 +44,6 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-
     final availableWidth = mediaQuery.size.width - 160;
 
     return Scaffold(

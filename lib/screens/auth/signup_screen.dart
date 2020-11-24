@@ -322,9 +322,8 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Stack(
             children: <Widget>[
               Container(
+                alignment: Alignment.center,
                 decoration: verticalGradient,
-              ),
-              Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),

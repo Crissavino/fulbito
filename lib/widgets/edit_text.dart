@@ -124,6 +124,7 @@ class _EditTextState extends State<EditText> {
           appBar: AppBar(
             title: widget.isNameEdited ? Text('Nombre') : Text('Descripcion'),
             elevation: 0.0,
+            leading: leadingArrowDown(context),
             flexibleSpace: Container(
               decoration: horizontalGradient,
             ),

@@ -12,7 +12,7 @@ class UpcomingMatches extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.only(left: 10.0, top: 10.0),
+            margin: EdgeInsets.only(left: 10.0, top: 0.0),
             child: Text(
               'Proximos partidos',
               style: TextStyle(

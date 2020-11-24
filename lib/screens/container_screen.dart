@@ -20,7 +20,6 @@ class _ContainerScreenState extends State<ContainerScreen> {
 
   Container _buildPlayNowPostButton() {
     return Container(
-      padding: const EdgeInsets.only(top: 30.0),
       child: IconButton(
         icon: Icon(Icons.add_circle_outline),
         iconSize: 30.0,
@@ -34,7 +33,6 @@ class _ContainerScreenState extends State<ContainerScreen> {
 
   Container _buildCreateGroupButton() {
     return Container(
-      padding: const EdgeInsets.only(top: 30.0),
       child: IconButton(
         icon: Icon(Icons.add_circle_outline),
         iconSize: 30.0,
@@ -55,7 +53,6 @@ class _ContainerScreenState extends State<ContainerScreen> {
 
   Container _buildCreateMatchButton() {
     return Container(
-      padding: EdgeInsets.only(top: 30.0),
       child: IconButton(
         icon: Icon(Icons.add_circle_outline),
         iconSize: 30.0,
@@ -94,62 +91,6 @@ class _ContainerScreenState extends State<ContainerScreen> {
     }
   }
 
-  Widget _buildSearchTF() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              padding: (currentIndex == 3)
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(left: 25.0, right: 25.0),
-              margin: EdgeInsets.only(top: 40.0, left: 10.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6.0,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              width: (currentIndex == 3)
-                  ? MediaQuery.of(context).size.width * 0.95
-                  : MediaQuery.of(context).size.width * 0.8,
-              height: 30.0,
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'OpenSans',
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: -3),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
-                  hintText: 'Buscar',
-                  hintStyle: kHintTextStyle,
-                ),
-                onChanged: (val) {
-                  setState(() => search = val);
-                },
-              ),
-            ),
-          ],
-        ),
-        _buildAddButton(this.currentIndex),
-      ],
-    );
-  }
-
   _callSection(int paginaActual) {
     switch (paginaActual) {
       case 0:
@@ -175,6 +116,81 @@ class _ContainerScreenState extends State<ContainerScreen> {
         );
         break;
     }
+  }
+
+  Widget _buildSearchTF() {
+    final width = MediaQuery.of(context).size.width;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 30.0,
+          width: this.currentIndex == 3 ? width * 0.90 : width * 0.82,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6.0,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            keyboardType: TextInputType.text,
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: -3),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.grey,
+              ),
+              hintText: 'Buscar',
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (val) {
+              setState(() => search = val);
+            },
+          ),
+        ),
+        _buildAddButton(this.currentIndex),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        flexibleSpace: Container(
+          decoration: horizontalGradient,
+          padding: this.currentIndex == 3
+              ? EdgeInsets.only(left: 10.0, top: 33.0, right: 10.0, bottom: 10.0)
+              : EdgeInsets.only(left: 10.0, top: 33.0),
+          alignment: Alignment.center,
+          child: _buildSearchTF(),
+        ),
+      ),
+      body: Container(
+        decoration: horizontalGradient,
+        child: SafeArea(
+          child: _callSection(currentIndex),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: (currentIndex != 0)
+            ? BoxDecoration(color: Colors.white)
+            : horizontalGradient,
+        child: _buildBottomNavigationBarRounded(),
+      ),
+    );
   }
 
   Widget _buildBottomNavigationBarRounded() {
@@ -238,79 +254,4 @@ class _ContainerScreenState extends State<ContainerScreen> {
     );
   }
 
-  Widget _buildBottomNavigationBarRect() {
-    return BottomNavigationBar(
-      iconSize: 25,
-      showUnselectedLabels: false,
-      selectedItemColor: Colors.green[400],
-      unselectedItemColor: Colors.green[900],
-      currentIndex: currentIndex,
-      onTap: (index) {
-        setState(() {
-          currentIndex = index;
-        });
-      },
-      items: [
-        BottomNavigationBarItem(
-          // ignore: deprecated_member_use
-          title: Text('Juga ya!'),
-          icon: Icon(
-            Icons.play_arrow_outlined,
-          ),
-        ),
-        BottomNavigationBarItem(
-          // ignore: deprecated_member_use
-          title: Text('Chats'),
-          icon: Icon(Icons.chat_bubble_outline_rounded),
-        ),
-        BottomNavigationBarItem(
-          // ignore: deprecated_member_use
-          title: Text('Partidos'),
-          icon: Icon(Icons.sports_soccer),
-        ),
-        BottomNavigationBarItem(
-          // ignore: deprecated_member_use
-          title: Text('Configuracion'),
-          icon: Icon(Icons.brightness_5),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Colors.green[400],
-                Colors.green[500],
-                Colors.green[600],
-                Colors.green[700],
-              ],
-              stops: [0.1, 0.4, 0.7, 0.9],
-            ),
-          ),
-          child: _buildSearchTF(),
-        ),
-      ),
-      body: Container(
-        decoration: horizontalGradient,
-        child: SafeArea(
-          child: _callSection(currentIndex),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: (currentIndex != 0)
-            ? BoxDecoration(color: Colors.white)
-            : horizontalGradient,
-        child: _buildBottomNavigationBarRounded(),
-      ),
-    );
-  }
 }

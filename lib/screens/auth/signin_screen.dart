@@ -302,6 +302,10 @@ class _SigninScreenState extends State<SigninScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final availableWidth = mediaQuery.size.width - 160;
+    final availableHeight = mediaQuery.size.height;
+
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -310,10 +314,9 @@ class _SigninScreenState extends State<SigninScreen> {
           child: Stack(
             children: <Widget>[
               Container(
+                alignment: Alignment.center,
                 decoration: verticalGradient,
-              ),
-              Container(
-                height: double.infinity,
+                height: availableHeight,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
