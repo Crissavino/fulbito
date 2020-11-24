@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
@@ -260,12 +261,15 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   void _settingModalBottomSheet(Player player, BuildContext context) {
     final User user = User.fromJson(player.user);
 
-    // cambiar de acuerdo a si es iPhone o Android
-
     showModalBottomSheet(
+      backgroundColor: Colors.transparent,
         context: context,
         builder: (BuildContext bc) {
           return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: screenBorders,
+            ),
             padding: EdgeInsets.only(bottom: 30.0),
             child: new Wrap(
               children: <Widget>[
