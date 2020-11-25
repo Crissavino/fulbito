@@ -248,7 +248,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   final registerResp = await _authService.register(
                       this.fullName, this.email, this.password);
                   if (registerResp == true) {
-                    _socketService.connect();
+                    _socketService.connect(_authService.user);
                     Navigator.pushReplacementNamed(context, 'chats');
                   } else {
                     // mostrar alerta

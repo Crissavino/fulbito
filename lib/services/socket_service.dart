@@ -16,7 +16,7 @@ class SocketService with ChangeNotifier {
   IO.Socket get socket => this._socket;
   Function get emit => this._socket.emit;
 
-  void connect() async {
+  void connect(dynamic user) async {
     final token = await AuthService.getToken();
 
     // Dart client
@@ -29,6 +29,7 @@ class SocketService with ChangeNotifier {
 
     this._socket.on('connect', (_) {
       this._serverStatus = ServerStatus.Online;
+      this.socket.emit('connectToChatRooms', user);
       notifyListeners();
     });
 

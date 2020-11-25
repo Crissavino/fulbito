@@ -7,6 +7,7 @@ import 'package:fulbito/models/user.dart';
 import 'package:fulbito/screens/chats/chat_room_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
+import 'package:fulbito/services/socket_service.dart';
 import 'package:provider/provider.dart';
 
 class RecentChats extends StatefulWidget {
@@ -21,15 +22,22 @@ class _RecentChatsState extends State<RecentChats> {
   AuthService _authService;
   User _currentUser;
   bool loading;
+  SocketService _socketService;
 
   @override
   void initState() {
     this._chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
     this._authService = Provider.of<AuthService>(context, listen: false);
+    this._socketService = Provider.of<SocketService>(context, listen: false);
     this._currentUser = this._authService.user;
     _loadChatRooms();
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   void _loadChatRooms() async {
@@ -96,6 +104,10 @@ class _RecentChatsState extends State<RecentChats> {
     return GestureDetector(
       onTap: () async {
         chatRoomService.selectedChatRoom = chat;
+        this._socketService.socket.emit('enterChatRoom', {
+          'chatRoom': chat,
+          'user': this._currentUser,
+        });
         Navigator.push(
           context,
           SlideBottomRoute(
