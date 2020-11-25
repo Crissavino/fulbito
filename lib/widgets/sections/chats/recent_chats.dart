@@ -32,12 +32,26 @@ class _RecentChatsState extends State<RecentChats> {
     this._currentUser = this._authService.user;
     _loadChatRooms();
 
+    this._socketService.socket?.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
+
     super.initState();
   }
 
   @override
   void dispose() {
+    this._socketService.socket.off('chatRoomMessage-recentChats');
     super.dispose();
+  }
+
+  void _receiveChatRoomMessage(dynamic payload) {
+    ChatRoom chat = this._allChatRooms.where((ChatRoom chat) => chat.id == payload['message']['chatRoom']).first;
+    chat.lastMessage = payload['message'];
+
+    print(chat.lastMessage['text']);
+
+    setState(() {
+      this._allChatRooms = this._allChatRooms;
+    });
   }
 
   void _loadChatRooms() async {
@@ -101,6 +115,12 @@ class _RecentChatsState extends State<RecentChats> {
 
   GestureDetector _buildChatRoomRow(
       BuildContext context, ChatRoom chat, ChatRoomService chatRoomService) {
+    final DateTime parsedTime = DateTime.tryParse(chat.lastMessage['time']);
+    final messageTime = '${parsedTime.hour}:${parsedTime.minute}';
+    print(this._currentUser.id);
+    print(chat.lastMessage['text']);
+    print(chat.lastMessage['unread']);
+    bool isUnread = chat.lastMessage['sender'] == this._currentUser.id ? false : chat.lastMessage['unread'];
     return GestureDetector(
       onTap: () async {
         chatRoomService.selectedChatRoom = chat;
@@ -167,7 +187,7 @@ class _RecentChatsState extends State<RecentChats> {
             Column(
               children: <Widget>[
                 Text(
-                  '15:00',
+                  messageTime.toString(),
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 15.0,
@@ -175,7 +195,7 @@ class _RecentChatsState extends State<RecentChats> {
                   ),
                 ),
                 SizedBox(height: 5.0),
-                chat.unreadMessages
+                isUnread
                     ? Container(
                         width: 40.0,
                         height: 20.0,

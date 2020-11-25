@@ -19,7 +19,7 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     final User currentUser = authService.user;
-    final userId = this.sender is User ? this.sender.id : this.sender['id'];
+    final userId = this.sender is User ? this.sender.id : this.sender['_id'];
 
     return FadeTransition(
       opacity: animationController,

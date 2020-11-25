@@ -30,6 +30,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
   AuthService _authService;
   ChatRoom chatRoom;
   User currentUser;
+  dynamic currentDevice;
   SocketService socketService;
   List<ChatMessage> _messages = [];
   bool isLoading = false;
@@ -39,13 +40,15 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
   void initState() {
     this._authService = Provider.of<AuthService>(context, listen: false);
     this.currentUser = this._authService.user;
+    this.currentDevice = this._authService.device;
+    print(this.currentDevice);
     this._chatRoomService =
         Provider.of<ChatRoomService>(context, listen: false);
 
     this.socketService = Provider.of<SocketService>(context, listen: false);
-    this.socketService.socket.on('mensaje-personal', _escucharMensaje);
-    this.socketService.socket.on('chatRoomMessage', _receiveMessage);
-    this.socketService.socket.on('newUserEnter', (payload) {
+    this.socketService.socket?.on('mensaje-personal', _escucharMensaje);
+    this.socketService.socket?.on('chatRoomMessage', _receiveMessage);
+    this.socketService.socket?.on('newUserEnter', (payload) {
       print(payload);
     });
 
@@ -65,6 +68,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // widget tree.
     this.socketService.socket.off('mensaje-personal');
     this.socketService.socket.off('newUserEnter');
+    this.socketService.socket.off('chatRoomMessage');
     // this.socketService.socket.dispose();
     super.dispose();
   }
@@ -200,6 +204,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
     this.socketService.socket.emit('chatRoomMessage', {
       'sender': this.currentUser,
+      'senderDevice': this.currentDevice,
       'chatRoom': this.chatRoom,
       'text': this.textMessage
     });
@@ -209,8 +214,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
   }
 
   void _receiveMessage(dynamic payload) {
-    print(payload);
-
     ChatMessage message = ChatMessage(
       text: payload['text'],
       sender: payload['de'],

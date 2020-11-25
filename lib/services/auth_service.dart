@@ -5,6 +5,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fulbito/globals/environment.dart';
+import 'package:fulbito/models/device.dart';
 import 'package:fulbito/models/login_response.dart';
 import 'package:fulbito/models/register_response.dart';
 import 'package:fulbito/models/renew_token_response.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService with ChangeNotifier {
   User user;
+  dynamic device;
   bool _authenticating = false;
 
   // Create storage
@@ -41,6 +43,8 @@ class AuthService with ChangeNotifier {
   Future<bool> login(String email, String pass) async {
     this.authenticating = true;
 
+    final List<String> deviceInformation = await getDeviceDetails();
+
     final data = {"email": email, "password": pass};
 
     final resp = await http.post(
@@ -54,6 +58,7 @@ class AuthService with ChangeNotifier {
       final loginResponse = loginResponseFromJson(resp.body);
       this.user = loginResponse.usuario;
       await this._guardarToken(loginResponse.token);
+      this.device = loginResponse.usuario.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
 
       return true;
     } else {
@@ -95,6 +100,7 @@ class AuthService with ChangeNotifier {
       }
       final registerResponse = registerResponseFromJson(resp.body);
       this.user = registerResponse.user;
+      this.device = registerResponse.user.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
       await this._guardarToken(registerResponse.token);
 
       return true;
@@ -106,6 +112,8 @@ class AuthService with ChangeNotifier {
 
   Future<bool> isLoggedIn() async {
     final token = await this._storage.read(key: 'token');
+
+    final List<String> deviceInformation = await getDeviceDetails();
 
     if (token == null) return false;
 
@@ -124,7 +132,7 @@ class AuthService with ChangeNotifier {
       final renewTokenResponse = renewTokenResponseFromJson(resp.body);
       // TODO controlar porque no lo procesa
       this.user = renewTokenResponse.user;
-
+      this.device = renewTokenResponse.user.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
       await this._guardarToken(renewTokenResponse.token);
       return true;
     } else {
