@@ -112,7 +112,7 @@ class AuthService with ChangeNotifier {
 
   Future<bool> isLoggedIn() async {
     final token = await this._storage.read(key: 'token');
-
+    // final token = null;
     final List<String> deviceInformation = await getDeviceDetails();
 
     if (token == null) return false;

@@ -41,16 +41,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     this._authService = Provider.of<AuthService>(context, listen: false);
     this.currentUser = this._authService.user;
     this.currentDevice = this._authService.device;
-    print(this.currentDevice);
     this._chatRoomService =
         Provider.of<ChatRoomService>(context, listen: false);
 
     this.socketService = Provider.of<SocketService>(context, listen: false);
-    this.socketService.socket?.on('mensaje-personal', _escucharMensaje);
-    this.socketService.socket?.on('chatRoomMessage', _receiveMessage);
-    this.socketService.socket?.on('newUserEnter', (payload) {
-      print(payload);
-    });
+    this.socketService.socket.on('chatRoomMessage', _receiveMessage);
+    this.socketService.socket.on('newUserEnter', (payload) => payload);
 
     this.chatRoom = this._chatRoomService.selectedChatRoom;
     _textController.addListener(_getLatestValue);
@@ -66,7 +62,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     _textController.dispose();
     // Clean up the controller when the widget is removed from the
     // widget tree.
-    this.socketService.socket.off('mensaje-personal');
     this.socketService.socket.off('newUserEnter');
     this.socketService.socket.off('chatRoomMessage');
     // this.socketService.socket.dispose();
@@ -193,6 +188,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     final newMessage = ChatMessage(
       text: this.textMessage,
       sender: this.currentUser,
+      time: DateTime.now().toString(),
       animationController: AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400),
@@ -202,7 +198,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // desp de insertar el mensaje disparo la animacion
     newMessage.animationController.forward();
 
-    this.socketService.socket.emit('chatRoomMessage', {
+    this.socketService.emit('chatRoomMessage', {
       'sender': this.currentUser,
       'senderDevice': this.currentDevice,
       'chatRoom': this.chatRoom,
@@ -217,6 +213,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     ChatMessage message = ChatMessage(
       text: payload['text'],
       sender: payload['de'],
+      time: DateTime.now().toString(),
       animationController: AnimationController(
         vsync: this,
         duration: Duration(
@@ -231,7 +228,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
     message.animationController.forward();
   }
-
 
   Widget _buildMessageComposer() {
     return Container(
@@ -288,15 +284,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
         .getAllMyChatRoomMessages(this.chatRoom.id, this.currentUser.id);
     final history = myMessages.map(
       (m) => ChatMessage(
-        text: m.text,
-        sender: m.sender,
-        animationController: AnimationController(
-          vsync: this,
-          duration: Duration(
-            milliseconds: 0,
-          ),
-        )..forward(),
-      ),
+          text: m.text,
+          sender: m.sender,
+          time: m.time,
+          animationController: AnimationController(
+            vsync: this,
+            duration: Duration(
+              milliseconds: 0,
+            ),
+          )..forward(),
+        )
     );
 
     this.isLoading = false;
@@ -318,24 +315,4 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     );
   }
 
-  void _escucharMensaje(dynamic payload) {
-    print(payload);
-
-    ChatMessage message = ChatMessage(
-      text: payload['mensaje'],
-      sender: payload['de'],
-      animationController: AnimationController(
-        vsync: this,
-        duration: Duration(
-          milliseconds: 400,
-        ),
-      ),
-    );
-
-    setState(() {
-      _messages.insert(0, message);
-    });
-
-    message.animationController.forward();
-  }
 }

@@ -3,6 +3,7 @@ import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/mostrar_alerta.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
+import 'package:fulbito/services/socket_service.dart';
 import 'package:fulbito/services/users_service.dart';
 import 'package:fulbito/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
   String error = '';
   String groupName = '';
   bool isLoading = false;
+  SocketService _socketService;
 
   Widget _buildGroupNameTF() {
     return Column(
@@ -54,6 +56,13 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
         ),
       ],
     );
+  }
+
+  @override
+  void initState() {
+    this._socketService = Provider.of<SocketService>(context, listen: false);
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -101,6 +110,11 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
 
                         if (createChatRoomResponse['success'] == true) {
                           usersService.emptySelectedUsersArray();
+
+                          this._socketService.socket.emit('newChatRoom', {
+                            'chatRoom': createChatRoomResponse['chatRoom']
+                          });
+
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (_) => ContainerScreen(),

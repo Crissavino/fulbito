@@ -43,8 +43,6 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final availableWidth = mediaQuery.size.width - 160;
 
     return Scaffold(
       body: CustomScrollView(
@@ -93,14 +91,26 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
     final availableWidth = mediaQuery.size.width;
 
     return SliverAppBar(
-      leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pop(context, this._chatRoomService.selectedChatRoom);
-          }),
+      leading: Container(
+        margin: EdgeInsets.only(left: 10.0),
+        decoration: BoxDecoration(
+            color: Colors.black38,
+            shape: BoxShape.circle
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: IconButton(
+            splashColor: Colors.transparent,
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20.0,
+              ),
+              onPressed: () {
+                Navigator.pop(context, this._chatRoomService.selectedChatRoom);
+              }),
+        ),
+      ),
       elevation: 2.0,
       backgroundColor: Colors.green[400],
       expandedHeight: 200.0,
@@ -147,7 +157,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CircleAvatar(
-                      backgroundColor: Colors.white60,
+                      backgroundColor: Colors.black38,
                       child: IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () => getImage,

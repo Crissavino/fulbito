@@ -8,6 +8,7 @@ import 'package:fulbito/screens/chats/chat_room_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
 import 'package:fulbito/services/socket_service.dart';
+import 'package:fulbito/widgets/sections/chats/chat_room_rc.dart';
 import 'package:provider/provider.dart';
 
 class RecentChats extends StatefulWidget {
@@ -15,14 +16,15 @@ class RecentChats extends StatefulWidget {
   _RecentChatsState createState() => _RecentChatsState();
 }
 
-class _RecentChatsState extends State<RecentChats> {
-  // MessageBloc messageBloc = MessageBloc();
+class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin {
   ChatRoomService _chatRoomService;
-  List<ChatRoom> _allChatRooms;
+  List<ChatRoom> _allChatRooms = [];
+  List<ChatRoomRC> _allMyChatRooms = [];
   AuthService _authService;
   User _currentUser;
   bool loading;
   SocketService _socketService;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -30,37 +32,113 @@ class _RecentChatsState extends State<RecentChats> {
     this._authService = Provider.of<AuthService>(context, listen: false);
     this._socketService = Provider.of<SocketService>(context, listen: false);
     this._currentUser = this._authService.user;
+
+    this._socketService.socket.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
+    this._socketService.socket.on('newChatRoom-recentChats', _chatRoomCreated);
     _loadChatRooms();
-
-    this._socketService.socket?.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
-
     super.initState();
   }
 
   @override
   void dispose() {
+    for (ChatRoomRC chat in _allMyChatRooms) {
+      chat.animationController.dispose();
+    }
     this._socketService.socket.off('chatRoomMessage-recentChats');
+    this._socketService.socket.off('newChatRoom-recentChats');
     super.dispose();
   }
 
-  void _receiveChatRoomMessage(dynamic payload) {
-    ChatRoom chat = this._allChatRooms.where((ChatRoom chat) => chat.id == payload['message']['chatRoom']).first;
-    chat.lastMessage = payload['message'];
-
-    print(chat.lastMessage['text']);
+  void _chatRoomCreated(dynamic payload) {
+    final newChatRoomRC = ChatRoomRC(
+        chat: ChatRoom.fromJson(payload['newChatRoom']),
+        currentUser: this._currentUser,
+        animationController: AnimationController(
+          vsync: this,
+          duration: Duration(milliseconds: 800),
+        ),
+    );
 
     setState(() {
-      this._allChatRooms = this._allChatRooms;
+      this._allMyChatRooms.insert(0, newChatRoomRC);
     });
+
+    newChatRoomRC.animationController.forward();
+
+    this._focusNode.requestFocus();
+
+    // List allChats = this._allChatRooms;
+    // allChats.insert(0, ChatRoom.fromJson(payload['newChatRoom']));
+    //
+    // setState(() {
+    //   this._allChatRooms = allChats;
+    // });
+  }
+
+  void _receiveChatRoomMessage(dynamic payload) {
+
+    ChatRoomRC chatRC = this._allMyChatRooms.where((ChatRoomRC chatRC) => chatRC.chat.id == payload['messageDevice']['chatRoom']['_id']).first;
+    chatRC.chat.lastMessage = payload['messageDevice'];
+    print(payload['messageDevice']['_id']);
+    print(payload['messageDevice']['unread']);
+
+    // TODO revisar por que aparece mal el NEW del mensaje
+
+    bool isFirstChatRoom = this._allMyChatRooms[0].chat.id == payload['messageDevice']['chatRoom']['_id'];
+    final newChatRoomRC = ChatRoomRC(
+      chat: chatRC.chat,
+      currentUser: this._currentUser,
+      animationController: AnimationController(
+        vsync: this,
+        duration: isFirstChatRoom ? Duration(milliseconds: 0) : Duration(milliseconds: 300),
+      ),
+    );
+
+    this._allMyChatRooms.removeWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
+
+    setState(() {
+      this._allMyChatRooms.insert(0, newChatRoomRC);
+    });
+
+    newChatRoomRC.animationController.forward();
+
+    this._focusNode.requestFocus();
+
+    //
+
+    // ChatRoom chat = this._allChatRooms.where((ChatRoom chat) => chat.id == payload['messageDevice']['chatRoom']['_id']).first;
+    // chat.lastMessage = payload['messageDevice'];
+    //
+    // this._allChatRooms.removeWhere((ChatRoom chatRoom) => chatRoom.id == chat.id);
+    //
+    // this._allChatRooms.insert(0, chat);
+    //
+    // setState(() {
+    //   this._allChatRooms = this._allChatRooms;
+    // });
   }
 
   void _loadChatRooms() async {
     this.loading = true;
-    this._chatRoomService.allChatRooms = await this._chatRoomService.getAllMyChatRooms(this._currentUser.id);
-    this._allChatRooms = this._chatRoomService.allChatRooms;
+    List<ChatRoom> myChatRooms = await this._chatRoomService.getAllMyChatRooms(this._currentUser.id);
+    final history = myChatRooms.map(
+        (chat) => ChatRoomRC(
+          chat: chat,
+          currentUser: this._currentUser,
+          animationController: AnimationController(
+            vsync: this,
+            duration: Duration(
+              milliseconds: 0,
+            ),
+          )..forward(),
+        )
+    );
+
+    this.loading = false;
     setState(() {
-      this.loading = false;
+      this._allMyChatRooms.insertAll(0, history);
     });
+
   }
 
   @override
@@ -84,8 +162,7 @@ class _RecentChatsState extends State<RecentChats> {
   }
 
   _buildChatRoomList() {
-    if(this._allChatRooms.isEmpty){
-
+    if(this._allMyChatRooms.isEmpty){
       return Container(
           margin: EdgeInsets.all(10.0),
           alignment: Alignment.center,
@@ -100,125 +177,11 @@ class _RecentChatsState extends State<RecentChats> {
             ),
           )
       );
-
-    } else {
-      return ListView.builder(
-        itemCount: (this._allChatRooms != null) ? this._allChatRooms.length : 0,
-        itemBuilder: (BuildContext context, int index) {
-          final ChatRoom chat = this._allChatRooms[index];
-          return _buildChatRoomRow(context, chat, _chatRoomService);
-        },
-      );
     }
-
-  }
-
-  GestureDetector _buildChatRoomRow(
-      BuildContext context, ChatRoom chat, ChatRoomService chatRoomService) {
-    final DateTime parsedTime = DateTime.tryParse(chat.lastMessage['time']);
-    final messageTime = '${parsedTime.hour}:${parsedTime.minute}';
-    print(this._currentUser.id);
-    print(chat.lastMessage['text']);
-    print(chat.lastMessage['unread']);
-    bool isUnread = chat.lastMessage['sender'] == this._currentUser.id ? false : chat.lastMessage['unread'];
-    return GestureDetector(
-      onTap: () async {
-        chatRoomService.selectedChatRoom = chat;
-        this._socketService.socket.emit('enterChatRoom', {
-          'chatRoom': chat,
-          'user': this._currentUser,
-        });
-        Navigator.push(
-          context,
-          SlideBottomRoute(
-            page: ChatRoomScreen(),
-          ),
-        );
-      },
-      child: Container(
-        margin:
-            EdgeInsets.only(top: 10.0, bottom: 2.0, right: 10.0, left: 10.0),
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 35.0,
-                  backgroundImage: NetworkImage(
-                      'https://img2.freepng.es/20180228/grw/kisspng-logo-football-photography-vector-football-5a97847a010f99.3151271415198792900044.jpg'),
-                ),
-                SizedBox(width: 10.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      chat.name,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5.0),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      child: Text(
-                        (chat.lastMessage != null)
-                            ? chat.lastMessage['text']
-                            : '',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              children: <Widget>[
-                Text(
-                  messageTime.toString(),
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 5.0),
-                isUnread
-                    ? Container(
-                        width: 40.0,
-                        height: 20.0,
-                        decoration: BoxDecoration(
-                          color: Colors.green[400],
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'NEW',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    : Text(''),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return ListView.builder(
+      itemCount: this._allMyChatRooms.length,
+      itemBuilder: (BuildContext context, int index) => this._allMyChatRooms[index],
     );
   }
+
 }

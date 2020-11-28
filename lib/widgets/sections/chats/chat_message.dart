@@ -6,12 +6,14 @@ import 'package:provider/provider.dart';
 class ChatMessage extends StatelessWidget {
   final String text;
   final dynamic sender;
+  final String time;
   final AnimationController animationController;
 
   const ChatMessage({
     Key key,
     @required this.text,
     @required this.sender,
+    @required this.time,
     @required this.animationController,
   }) : super(key: key);
 
@@ -39,6 +41,10 @@ class ChatMessage extends StatelessWidget {
   }
 
   Widget _myMessage(BuildContext context, User currentUser) {
+    final DateTime parsedTime = DateTime.tryParse(this.time);
+    final messageHour = parsedTime.hour;
+    final messageMinute = parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
+    final messageTime = '$messageHour:$messageMinute';
     return Container(
       margin: EdgeInsets.only(
         top: 8.0,
@@ -71,7 +77,7 @@ class ChatMessage extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                '10:26',
+                messageTime.toString(),
                 // message.time.toString(),
                 style: TextStyle(
                   color: Colors.blueGrey,
@@ -98,6 +104,10 @@ class ChatMessage extends StatelessWidget {
 
   Widget _notMyMessage(BuildContext context, dynamic senderUser) {
     final userFullName = senderUser is User ? senderUser.fullName : senderUser['fullName'];
+    final DateTime parsedTime = DateTime.tryParse(this.time);
+    final messageHour = parsedTime.hour;
+    final messageMinute = parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
+    final messageTime = '$messageHour:$messageMinute';
     return Container(
       margin: EdgeInsets.only(
         top: 8.0,
@@ -129,7 +139,7 @@ class ChatMessage extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                '10:26',
+                messageTime.toString(),
                 // message.time.toString(),
                 style: TextStyle(
                   color: Colors.blueGrey,
