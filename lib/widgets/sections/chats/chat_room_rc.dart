@@ -50,14 +50,7 @@ class ChatRoomRC extends StatelessWidget {
     final messageHour = parsedTime.hour;
     final messageMinute = parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
     final messageTime = '$messageHour:$messageMinute';
-    bool isUnread = chat.lastMessage['unread'];
-    // TODO cambiar por leaveChatRoom
-    // this.socketService.socket.on('enterChatRoom', (payload) {
-    //   if(payload['chatRoom']['_id'] == chat.id){
-    //     isUnread = payload['lastMessage']['unread'];
-    //   }
-    // });
-    // print(isUnread);
+    bool isUnread = chat.lastMessage['unread'] ?? true;
 
     return GestureDetector(
       onTap: () async {

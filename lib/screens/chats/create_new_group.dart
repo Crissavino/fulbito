@@ -91,6 +91,7 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
                       if (_formKey.currentState.validate()) {
                         final chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
                         final currentUser = Provider.of<AuthService>(context, listen: false).user;
+                        final currentDevice = Provider.of<AuthService>(context, listen: false).device;
                         final usersService = Provider.of<UsersService>(context, listen: false);
                         final usersToAddToGroup = usersService.selectedSearchedUsers;
 
@@ -100,6 +101,7 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
 
                         dynamic createChatRoomResponse = await chatRoomService.createChatRoom(
                           currentUser,
+                          currentDevice,
                           groupName,
                           usersToAddToGroup,
                         );

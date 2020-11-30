@@ -31,12 +31,13 @@ class ChatRoomService with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<dynamic> createChatRoom(User currentUser, String groupName,
+  Future<dynamic> createChatRoom(User currentUser, dynamic currentDevice,String groupName,
       List<User> usersToAddToGroup) async {
 
     try {
       final data = <String, dynamic>{
         'currentUser': currentUser,
+        'currentDevice': currentDevice,
         'groupName': groupName,
         'usersToAddToGroup': usersToAddToGroup,
       };
