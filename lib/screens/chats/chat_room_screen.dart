@@ -64,7 +64,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // widget tree.
     this.socketService.socket.off('newUserEnter');
     this.socketService.socket.off('chatRoomMessage');
-    // this.socketService.socket.dispose();
     super.dispose();
   }
 
@@ -144,7 +143,23 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               appBar: AppBar(
                 title: _openChatInfo(context, _chatRoomService.selectedChatRoom),
                 elevation: 0.0,
-                leading: leadingArrowDown(context),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 35,
+                  ),
+                  padding: EdgeInsets.only(top: 4.0),
+                  onPressed: () {
+
+                    this.socketService.socket.emit('leaveChatRoom', {
+                      'chatRoom': _chatRoomService.selectedChatRoom,
+                      'user': this.currentUser,
+                      'device': this.currentDevice
+                    });
+
+                    Navigator.pop(context);
+                  },
+                ),
                 flexibleSpace: Container(
                   decoration: horizontalGradient,
                 ),

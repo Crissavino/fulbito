@@ -38,6 +38,7 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
 
     this._socketService.socket.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
     this._socketService.socket.on('newChatRoom-recentChats', _chatRoomCreated);
+    this._socketService.socket.on('leaveChatRoom-recentChats', _leaveChatRoomData);
     _loadChatRooms();
     super.initState();
   }
@@ -49,7 +50,36 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     }
     this._socketService.socket.off('chatRoomMessage-recentChats');
     this._socketService.socket.off('newChatRoom-recentChats');
+    this._socketService.socket.off('leaveChatRoom-recentChats');
     super.dispose();
+  }
+
+  void _leaveChatRoomData(dynamic payload) {
+    ChatRoomRC chatRC = this._allMyChatRooms.where((ChatRoomRC chatRC) => chatRC.chat.id == payload['chatRoom']['_id']).first;
+    chatRC.chat.lastMessage = payload['chatRoom']['lastMessage'];
+
+    final newChatRoomRC = ChatRoomRC(
+      chat: chatRC.chat,
+      currentUser: this._currentUser,
+      currentDevice: this._currentDevice,
+      animationController: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 0),
+      ),
+      socketService: this._socketService,
+
+    );
+
+    final chatPosition = this._allMyChatRooms.indexWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
+    this._allMyChatRooms.removeWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
+    setState(() {
+      this._allMyChatRooms.insert(chatPosition, newChatRoomRC);
+    });
+
+    newChatRoomRC.animationController.forward();
+
+    this._focusNode.requestFocus();
+
   }
 
   void _chatRoomCreated(dynamic payload) {
