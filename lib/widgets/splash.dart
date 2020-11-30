@@ -21,8 +21,6 @@ class Splash extends StatelessWidget {
 
     final autenticado = await authService.isLoggedIn();
 
-    print(autenticado);
-
     if (autenticado) {
       await socketService.connect(authService.user);
       Navigator.pushReplacement(

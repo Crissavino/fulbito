@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
 import 'package:fulbito/models/chat_room.dart';
+import 'package:fulbito/models/device.dart';
 import 'package:fulbito/models/player.dart';
 import 'package:fulbito/models/user.dart';
 import 'package:fulbito/screens/chats/chat_room_screen.dart';
@@ -22,6 +23,7 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
   List<ChatRoomRC> _allMyChatRooms = [];
   AuthService _authService;
   User _currentUser;
+  dynamic _currentDevice;
   bool loading;
   SocketService _socketService;
   final FocusNode _focusNode = FocusNode();
@@ -32,6 +34,7 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     this._authService = Provider.of<AuthService>(context, listen: false);
     this._socketService = Provider.of<SocketService>(context, listen: false);
     this._currentUser = this._authService.user;
+    this._currentDevice = this._authService.device;
 
     this._socketService.socket.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
     this._socketService.socket.on('newChatRoom-recentChats', _chatRoomCreated);
@@ -53,10 +56,12 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     final newChatRoomRC = ChatRoomRC(
         chat: ChatRoom.fromJson(payload['newChatRoom']),
         currentUser: this._currentUser,
+        currentDevice: this._currentDevice,
         animationController: AnimationController(
           vsync: this,
           duration: Duration(milliseconds: 800),
         ),
+      socketService: this._socketService,
     );
 
     setState(() {
@@ -67,20 +72,12 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
 
     this._focusNode.requestFocus();
 
-    // List allChats = this._allChatRooms;
-    // allChats.insert(0, ChatRoom.fromJson(payload['newChatRoom']));
-    //
-    // setState(() {
-    //   this._allChatRooms = allChats;
-    // });
   }
 
   void _receiveChatRoomMessage(dynamic payload) {
 
     ChatRoomRC chatRC = this._allMyChatRooms.where((ChatRoomRC chatRC) => chatRC.chat.id == payload['messageDevice']['chatRoom']['_id']).first;
     chatRC.chat.lastMessage = payload['messageDevice'];
-    print(payload['messageDevice']['_id']);
-    print(payload['messageDevice']['unread']);
 
     // TODO revisar por que aparece mal el NEW del mensaje
 
@@ -88,10 +85,13 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     final newChatRoomRC = ChatRoomRC(
       chat: chatRC.chat,
       currentUser: this._currentUser,
+      currentDevice: this._currentDevice,
       animationController: AnimationController(
         vsync: this,
         duration: isFirstChatRoom ? Duration(milliseconds: 0) : Duration(milliseconds: 300),
       ),
+      socketService: this._socketService,
+
     );
 
     this._allMyChatRooms.removeWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
@@ -104,18 +104,6 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
 
     this._focusNode.requestFocus();
 
-    //
-
-    // ChatRoom chat = this._allChatRooms.where((ChatRoom chat) => chat.id == payload['messageDevice']['chatRoom']['_id']).first;
-    // chat.lastMessage = payload['messageDevice'];
-    //
-    // this._allChatRooms.removeWhere((ChatRoom chatRoom) => chatRoom.id == chat.id);
-    //
-    // this._allChatRooms.insert(0, chat);
-    //
-    // setState(() {
-    //   this._allChatRooms = this._allChatRooms;
-    // });
   }
 
   void _loadChatRooms() async {
@@ -125,12 +113,15 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
         (chat) => ChatRoomRC(
           chat: chat,
           currentUser: this._currentUser,
+          currentDevice: this._currentDevice,
           animationController: AnimationController(
             vsync: this,
             duration: Duration(
               milliseconds: 0,
             ),
           )..forward(),
+          socketService: this._socketService,
+
         )
     );
 

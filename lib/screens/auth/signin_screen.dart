@@ -169,7 +169,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   final loginResp =
                       await _authService.login(this.email, this.password);
                   if (loginResp == true) {
-                    _socketService.connect(_authService.user);
+                    await _socketService.connect(_authService.user);
 
                     Navigator.pushReplacementNamed(context, 'chats');
                   } else {

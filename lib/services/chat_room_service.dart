@@ -74,9 +74,13 @@ class ChatRoomService with ChangeNotifier {
   Future<List<ChatRoom>> getAllMyChatRooms(
     String userId,
   ) async {
+
+    final List<String> deviceInformation = await AuthService.getDeviceDetails();
+    final deviceID = deviceInformation[2];
+
     try {
       final resp = await http.get(
-          '${Environment.apiUrl}/chatRooms/getAllMyChatRooms?userId=$userId',
+          '${Environment.apiUrl}/chatRooms/getAllMyChatRooms?userId=$userId&deviceId=$deviceID',
           headers: {
             'Content-Type': 'application/json',
             'x-token': await AuthService.getToken()

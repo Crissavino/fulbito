@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/slide_bottom_route.dart';
 import 'package:fulbito/models/chat_room.dart';
+import 'package:fulbito/models/device.dart';
 import 'package:fulbito/models/user.dart';
 import 'package:fulbito/screens/chats/chat_room_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
+import 'package:fulbito/services/socket_service.dart';
 import 'package:provider/provider.dart';
 
 class ChatRoomRC extends StatelessWidget {
   final ChatRoom chat;
   final User currentUser;
+  final dynamic currentDevice;
   final AnimationController animationController;
+  final SocketService socketService;
 
   const ChatRoomRC({
     Key key,
     @required this.chat,
     @required this.currentUser,
+    @required this.currentDevice,
     @required this.animationController,
+    @required this.socketService,
   }) : super(key: key);
 
   @override
@@ -45,12 +51,17 @@ class ChatRoomRC extends StatelessWidget {
     final messageMinute = parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
     final messageTime = '$messageHour:$messageMinute';
     bool isUnread = chat.lastMessage['unread'];
-    print('isUnread');
-    print(isUnread);
 
     return GestureDetector(
       onTap: () async {
         chatRoomService.selectedChatRoom = chat;
+
+        this.socketService.socket.emit('enterChatRoom', {
+          'chatRoom': chat,
+          'user': this.currentUser,
+          'device': this.currentDevice
+        });
+
         Navigator.push(
           context,
           SlideBottomRoute(
