@@ -237,81 +237,75 @@ class ChatRoomService with ChangeNotifier {
   Future<dynamic> editGroupName(
       ChatRoom chatRoom, String newChatRoomName) async {
     await Future.delayed(Duration(seconds: 1));
-    chatRoom.name = newChatRoomName;
-    notifyListeners();
 
-    return {
-      'success': true,
+    final data = <String, dynamic>{
+      'chatRoomToEdit': chatRoom,
+      'newChatRoomName': newChatRoomName
     };
 
-    //RECUPERAR EL BACKEND DEL PENDRIVE
+    try {
+      final resp = await http.post(
+        '${Environment.apiUrl}/chatRooms/editGroupName',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': await AuthService.getToken()
+        },
+        body: json.encode(data),
+      );
 
-    // final url = '$_url/editGroupName?apiKey=$_apiKey';
+      final Map<String, dynamic> decodedData = json.decode(resp.body);
+      if (decodedData == null) return [];
+      if (decodedData['errors'] != null) return [];
 
-    // final data = <String, dynamic>{
-    //   'chatRoomToEdit': chatRoom,
-    //   'newChatRoomName': newChatRoomName
-    // };
+      chatRoom.name = newChatRoomName;
+      notifyListeners();
 
-    // final resp = await http.post(
-    //   url,
-    //   headers: {"Content-Type": "application/json"},
-    //   body: json.encode(data),
-    // );
+      return {
+        'success': true,
+      };
 
-    // final decodedData = json.decode(resp.body);
+    } catch (e) {
+      return {
+        'success': false,
+      };
+    }
 
-    // if (decodedData['response']['success'] != true) return false;
-
-    // ChatRoom chatRoomUpdated =
-    //     ChatRoom.fromJson(decodedData['response']['chatRoom']);
-
-    // final response = {
-    //   'success': decodedData['response']['success'],
-    //   'chatRoom': chatRoomUpdated
-    // };
-
-    // notifyListeners();
-
-    // return response;
   }
 
   Future<dynamic> editGroupDescription(
       ChatRoom chatRoom, String newChatRoomDesc) async {
-    chatRoom.description = newChatRoomDesc;
-    notifyListeners();
 
-    return {
-      'success': true,
+    final data = <String, dynamic>{
+      'chatRoomToEdit': chatRoom,
+      'newChatRoomDesc': newChatRoomDesc
     };
-    // final url = '$_url/editGroupDescription?apiKey=$_apiKey';
 
-    // final data = <String, dynamic>{
-    //   'chatRoomToEdit': chatRoom,
-    //   'newChatRoomDesc': newChatRoomDesc
-    // };
+    try {
+      final resp = await http.post(
+        '${Environment.apiUrl}/chatRooms/editGroupDescription',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': await AuthService.getToken()
+        },
+        body: json.encode(data),
+      );
 
-    // final resp = await http.post(
-    //   url,
-    //   headers: {"Content-Type": "application/json"},
-    //   body: json.encode(data),
-    // );
+      final Map<String, dynamic> decodedData = json.decode(resp.body);
+      if (decodedData == null) return [];
+      if (decodedData['errors'] != null) return [];
 
-    // final decodedData = json.decode(resp.body);
+      chatRoom.description = newChatRoomDesc;
+      notifyListeners();
 
-    // if (decodedData['response']['success'] != true) return false;
+      return {
+        'success': true,
+      };
 
-    // ChatRoom chatRoomUpdated =
-    //     ChatRoom.fromJson(decodedData['response']['chatRoom']);
-
-    // final response = {
-    //   'success': decodedData['response']['success'],
-    //   'chatRoom': chatRoomUpdated
-    // };
-
-    // notifyListeners();
-
-    // return response;
+    } catch (e) {
+      return {
+        'success': false,
+      };
+    }
   }
 
   Future<dynamic> editGroupImage(ChatRoom chatRoom, File groupImage) async {
