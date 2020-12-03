@@ -45,7 +45,13 @@ class AuthService with ChangeNotifier {
 
     final List<String> deviceInformation = await getDeviceDetails();
 
-    final data = {"email": email, "password": pass};
+    final data = {
+      "email": email,
+      "password": pass,
+      "deviceId": deviceInformation[2],
+      "deviceType": Platform.isIOS ? 'ios' : 'android',
+      "language": Platform.localeName,
+    };
 
     final resp = await http.post(
       '${Environment.apiUrl}/auth',
@@ -58,7 +64,11 @@ class AuthService with ChangeNotifier {
       final loginResponse = loginResponseFromJson(resp.body);
       this.user = loginResponse.usuario;
       await this._guardarToken(loginResponse.token);
-      this.device = loginResponse.usuario.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
+      this.device = loginResponse.usuario.devices.where((dynamic device) {
+        print(device['deviceId']);
+        print(deviceInformation[2]);
+        return device['deviceId'] == deviceInformation[2];
+      }).first;
 
       return true;
     } else {
