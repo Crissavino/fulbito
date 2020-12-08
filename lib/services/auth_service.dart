@@ -91,7 +91,6 @@ class AuthService with ChangeNotifier {
       "deviceId": deviceInformation[2]
     };
 
-
     final resp = await http.post(
       '${Environment.apiUrl}/auth/create',
       body: jsonEncode(data),
@@ -110,7 +109,9 @@ class AuthService with ChangeNotifier {
       }
       final registerResponse = registerResponseFromJson(resp.body);
       this.user = registerResponse.user;
-      this.device = registerResponse.user.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
+      this.device = registerResponse.user.devices
+          .where((dynamic device) => device['deviceId'] == deviceInformation[2])
+          .first;
       await this._guardarToken(registerResponse.token);
 
       return true;
@@ -138,11 +139,12 @@ class AuthService with ChangeNotifier {
     final Map<String, dynamic> decodedData = json.decode(resp.body);
 
     if (resp.statusCode == 200) {
-
       final renewTokenResponse = renewTokenResponseFromJson(resp.body);
       // TODO controlar porque no lo procesa
       this.user = renewTokenResponse.user;
-      this.device = renewTokenResponse.user.devices.where((dynamic device) => device['deviceId'] == deviceInformation[2]).first;
+      this.device = renewTokenResponse.user.devices
+          .where((dynamic device) => device['deviceId'] == deviceInformation[2])
+          .first;
       await this._guardarToken(renewTokenResponse.token);
       return true;
     } else {

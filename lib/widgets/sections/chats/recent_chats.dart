@@ -17,7 +17,8 @@ class RecentChats extends StatefulWidget {
   _RecentChatsState createState() => _RecentChatsState();
 }
 
-class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin {
+class _RecentChatsState extends State<RecentChats>
+    with TickerProviderStateMixin {
   ChatRoomService _chatRoomService;
   List<ChatRoom> _allChatRooms = [];
   List<ChatRoomRC> _allMyChatRooms = [];
@@ -30,15 +31,22 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
 
   @override
   void initState() {
-    this._chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+    this._chatRoomService =
+        Provider.of<ChatRoomService>(context, listen: false);
     this._authService = Provider.of<AuthService>(context, listen: false);
     this._socketService = Provider.of<SocketService>(context, listen: false);
     this._currentUser = this._authService.user;
     this._currentDevice = this._authService.device;
 
-    this._socketService.socket.on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
+    this
+        ._socketService
+        .socket
+        .on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
     this._socketService.socket.on('newChatRoom-recentChats', _chatRoomCreated);
-    this._socketService.socket.on('leaveChatRoom-recentChats', _leaveChatRoomData);
+    this
+        ._socketService
+        .socket
+        .on('leaveChatRoom-recentChats', _leaveChatRoomData);
     _loadChatRooms();
     super.initState();
   }
@@ -55,10 +63,12 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
   }
 
   void _leaveChatRoomData(dynamic payload) {
-    ChatRoomRC chatRC = this._allMyChatRooms.where((ChatRoomRC chatRC) => chatRC.chat.id == payload['chatRoom']['_id']).first;
-    chatRC.chat.lastMessage = payload['chatRoom']['lastMessage'];
+    ChatRoomRC chatRC = this
+        ._allMyChatRooms
+        .firstWhere((ChatRoomRC chatRC) => chatRC.chat.id == payload['chatRoom']['_id']);
+    chatRC.chat = ChatRoom.fromJson(payload['chatRoom']);
 
-    final newChatRoomRC = ChatRoomRC(
+    ChatRoomRC newChatRoomRC = ChatRoomRC(
       chat: chatRC.chat,
       currentUser: this._currentUser,
       currentDevice: this._currentDevice,
@@ -67,7 +77,6 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
         duration: Duration(milliseconds: 0),
       ),
       socketService: this._socketService,
-
     );
 
     final chatPosition = this._allMyChatRooms.indexWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
@@ -79,18 +88,17 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     newChatRoomRC.animationController.forward();
 
     this._focusNode.requestFocus();
-
   }
 
   void _chatRoomCreated(dynamic payload) {
-    final newChatRoomRC = ChatRoomRC(
-        chat: ChatRoom.fromJson(payload['newChatRoom']),
-        currentUser: this._currentUser,
-        currentDevice: this._currentDevice,
-        animationController: AnimationController(
-          vsync: this,
-          duration: Duration(milliseconds: 800),
-        ),
+    ChatRoomRC newChatRoomRC = ChatRoomRC(
+      chat: ChatRoom.fromJson(payload['newChatRoom']),
+      currentUser: this._currentUser,
+      currentDevice: this._currentDevice,
+      animationController: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 800),
+      ),
       socketService: this._socketService,
     );
 
@@ -101,30 +109,34 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     newChatRoomRC.animationController.forward();
 
     this._focusNode.requestFocus();
-
   }
 
   void _receiveChatRoomMessage(dynamic payload) {
+    ChatRoomRC chatRC = this
+        ._allMyChatRooms
+        .where((ChatRoomRC chatRC) =>
+            chatRC.chat.id == payload['messageDevice']['chatRoom']['_id'])
+        .first;
 
-    ChatRoomRC chatRC = this._allMyChatRooms.where((ChatRoomRC chatRC) => chatRC.chat.id == payload['messageDevice']['chatRoom']['_id']).first;
     chatRC.chat.lastMessage = payload['messageDevice'];
 
-    // TODO revisar por que aparece mal el NEW del mensaje
-
-    bool isFirstChatRoom = this._allMyChatRooms[0].chat.id == payload['messageDevice']['chatRoom']['_id'];
-    final newChatRoomRC = ChatRoomRC(
+    bool isFirstChatRoom = this._allMyChatRooms[0].chat.id ==
+        payload['messageDevice']['chatRoom']['_id'];
+    ChatRoomRC newChatRoomRC = ChatRoomRC(
       chat: chatRC.chat,
       currentUser: this._currentUser,
       currentDevice: this._currentDevice,
       animationController: AnimationController(
         vsync: this,
-        duration: isFirstChatRoom ? Duration(milliseconds: 0) : Duration(milliseconds: 300),
+        duration: isFirstChatRoom
+            ? Duration(milliseconds: 0)
+            : Duration(milliseconds: 300),
       ),
       socketService: this._socketService,
-
     );
 
-    this._allMyChatRooms.removeWhere((ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
+    this._allMyChatRooms.removeWhere(
+        (ChatRoomRC chatRoomRC) => chatRoomRC.chat.id == chatRC.chat.id);
 
     setState(() {
       this._allMyChatRooms.insert(0, newChatRoomRC);
@@ -133,14 +145,13 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
     newChatRoomRC.animationController.forward();
 
     this._focusNode.requestFocus();
-
   }
 
   void _loadChatRooms() async {
     this.loading = true;
-    List<ChatRoom> myChatRooms = await this._chatRoomService.getAllMyChatRooms(this._currentUser.id);
-    final history = myChatRooms.map(
-        (chat) => ChatRoomRC(
+    List<ChatRoom> myChatRooms =
+        await this._chatRoomService.getAllMyChatRooms(this._currentUser.id);
+    final history = myChatRooms.map((chat) => ChatRoomRC(
           chat: chat,
           currentUser: this._currentUser,
           currentDevice: this._currentDevice,
@@ -151,11 +162,10 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
             ),
           )..forward(),
           socketService: this._socketService,
-
-        )
-    );
+        ));
 
     this.loading = false;
+
     setState(() {
       this._allMyChatRooms.insertAll(0, history);
     });
@@ -173,17 +183,17 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
         child: ClipRRect(
           borderRadius: screenBorders,
           child: this.loading
-            ? Center(
-              child: circularLoading,
-            )
-            : _buildChatRoomList(),
+              ? Center(
+                  child: circularLoading,
+                )
+              : _buildChatRoomList(),
         ),
       ),
     );
   }
 
   _buildChatRoomList() {
-    if(this._allMyChatRooms.isEmpty){
+    if (this._allMyChatRooms.isEmpty) {
       return Container(
           margin: EdgeInsets.all(10.0),
           alignment: Alignment.center,
@@ -196,13 +206,62 @@ class _RecentChatsState extends State<RecentChats> with TickerProviderStateMixin
               fontWeight: FontWeight.w400,
               fontFamily: 'OpenSans',
             ),
-          )
-      );
+          ));
     }
     return ListView.builder(
       itemCount: this._allMyChatRooms.length,
-      itemBuilder: (BuildContext context, int index) => this._allMyChatRooms[index],
+      itemBuilder: (BuildContext context, int index) {
+        return Dismissible(
+          child: this._allMyChatRooms[index],
+          onDismissed: (DismissDirection direction) {
+            if (direction == DismissDirection.startToEnd) {
+              // TODO fijar el chat y siempre mostartlo arriba de todo
+              print('otras accociones');
+            } else {
+              // TODO eliminar el chat
+              print('eliminar');
+            }
+          },
+          key: Key(this._allMyChatRooms[index].chat.id),
+          background: Container(
+            color: Colors.black26,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                children: [
+                  Icon(Icons.push_pin, color: Colors.white),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text('Fijar chat',
+                      style: TextStyle(color: Colors.white, fontSize: 20.0)),
+                ],
+              ),
+            ),
+          ),
+          secondaryBackground: Container(
+            color: Colors.red,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.delete, color: Colors.white),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text('Eliminar chat',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0
+                      )
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
-
 }

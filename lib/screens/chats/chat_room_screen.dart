@@ -64,6 +64,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     // widget tree.
     this.socketService.socket.off('newUserEnter');
     this.socketService.socket.off('chatRoomMessage');
+    this.socketService.socket.off('enterChatRoom');
+    this.socketService.socket.off('leaveChatRoom');
     super.dispose();
   }
 
@@ -129,9 +131,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(
-            color: Colors.white
-          ),
+          decoration: BoxDecoration(color: Colors.white),
         ),
         SafeArea(
           top: false,
@@ -141,7 +141,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               backgroundColor: Colors.transparent,
               // backgroundColor: Theme.of(context).primaryColor,
               appBar: AppBar(
-                title: _openChatInfo(context, _chatRoomService.selectedChatRoom),
+                title:
+                    _openChatInfo(context, _chatRoomService.selectedChatRoom),
                 elevation: 0.0,
                 leading: IconButton(
                   icon: Icon(
@@ -150,7 +151,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                   ),
                   padding: EdgeInsets.only(top: 4.0),
                   onPressed: () {
-
                     this.socketService.socket.emit('leaveChatRoom', {
                       'chatRoom': _chatRoomService.selectedChatRoom,
                       'user': this.currentUser,
@@ -179,8 +179,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                         borderRadius: screenBorders,
                         child: (this.isLoading)
                             ? Center(
-                          child: circularLoading,
-                        )
+                                child: circularLoading,
+                              )
                             : _buildMessagesScreen(),
                       ),
                     ),
@@ -190,7 +190,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               ),
             ),
           ),
-          ),
+        ),
       ],
     );
   }
@@ -272,21 +272,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
           ),
           Platform.isIOS
               ? CupertinoButton(
-            child: Text(
-              'Enviar',
-              style: TextStyle(
-                  color: Colors.green[400]
-              ),
-            ),
-            onPressed: () => _handleSubmit(),
-          )
-              :
-          IconButton(
-            icon: Icon(Icons.send),
-            iconSize: 25.0,
-            color: Colors.green[400],
-            onPressed: () => _handleSubmit(),
-          ),
+                  child: Text(
+                    'Enviar',
+                    style: TextStyle(color: Colors.green[400]),
+                  ),
+                  onPressed: () => _handleSubmit(),
+                )
+              : IconButton(
+                  icon: Icon(Icons.send),
+                  iconSize: 25.0,
+                  color: Colors.green[400],
+                  onPressed: () => _handleSubmit(),
+                ),
         ],
       ),
     );
@@ -297,8 +294,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     List<DeviceMessage> myMessages = await this
         ._chatRoomService
         .getAllMyChatRoomMessages(this.chatRoom.id, this.currentUser.id);
-    final history = myMessages.map(
-      (m) => ChatMessage(
+    final history = myMessages.map((m) => ChatMessage(
           text: m.text,
           sender: m.sender,
           time: m.time,
@@ -308,8 +304,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               milliseconds: 0,
             ),
           )..forward(),
-        )
-    );
+        ));
 
     this.isLoading = false;
     setState(() {
@@ -329,5 +324,4 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
           ),
     );
   }
-
 }

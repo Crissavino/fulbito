@@ -20,20 +20,21 @@ class ChatRoomService with ChangeNotifier {
   AuthService _authService = AuthService();
 
   ChatRoom get selectedChatRoom => this._selectedChatRoom;
+
   set selectedChatRoom(ChatRoom chatRoom) {
     this._selectedChatRoom = chatRoom;
     notifyListeners();
   }
 
   List<ChatRoom> get allChatRooms => this._allChatRooms;
+
   set allChatRooms(List<ChatRoom> chatRooms) {
     this._allChatRooms = chatRooms;
     notifyListeners();
   }
 
-  Future<dynamic> createChatRoom(User currentUser, dynamic currentDevice,String groupName,
-      List<User> usersToAddToGroup) async {
-
+  Future<dynamic> createChatRoom(User currentUser, dynamic currentDevice,
+      String groupName, List<User> usersToAddToGroup) async {
     try {
       final data = <String, dynamic>{
         'currentUser': currentUser,
@@ -42,19 +43,16 @@ class ChatRoomService with ChangeNotifier {
         'usersToAddToGroup': usersToAddToGroup,
       };
 
-      final resp = await http.post(
-          '${Environment.apiUrl}/chatRooms/create',
+      final resp = await http.post('${Environment.apiUrl}/chatRooms/create',
           headers: {
             'Content-Type': 'application/json',
             'x-token': await AuthService.getToken()
           },
-          body: json.encode(data)
-      );
+          body: json.encode(data));
 
       final decodedData = json.decode(resp.body);
 
       if (decodedData['success']) {
-
         List<ChatRoom> newChatRooms = [];
         newChatRooms.addAll(this._allChatRooms);
         newChatRooms.add(ChatRoom.fromJson(decodedData['chatRoom']));
@@ -62,7 +60,6 @@ class ChatRoomService with ChangeNotifier {
         this._allChatRooms = newChatRooms;
 
         return decodedData;
-
       } else {
         return false;
       }
@@ -75,7 +72,6 @@ class ChatRoomService with ChangeNotifier {
   Future<List<ChatRoom>> getAllMyChatRooms(
     String userId,
   ) async {
-
     final List<String> deviceInformation = await AuthService.getDeviceDetails();
     final deviceID = deviceInformation[2];
 
@@ -85,8 +81,7 @@ class ChatRoomService with ChangeNotifier {
           headers: {
             'Content-Type': 'application/json',
             'x-token': await AuthService.getToken()
-          }
-      );
+          });
 
       final Map<String, dynamic> decodedData = json.decode(resp.body);
 
@@ -118,8 +113,7 @@ class ChatRoomService with ChangeNotifier {
           headers: {
             'Content-Type': 'application/json',
             'x-token': await AuthService.getToken()
-          }
-      );
+          });
 
       final Map<String, dynamic> decodedData = json.decode(resp.body);
       if (decodedData == null) return [];
@@ -133,60 +127,41 @@ class ChatRoomService with ChangeNotifier {
       });
 
       return messages;
-
     } catch (e) {
       return [];
     }
   }
 
-  // Future<List<DeviceMessageModel>> newMessage(
-  //     MessageModel message, UserModel user) async {
-  //   final url = '$_url/createMessages?firebaseId=${user.firebaseId}';
+  Future<dynamic> addPlayersToGroup(List<User> users, String chatRoomId) async {
 
-  //   final resp = await http.post(url,
-  //       headers: {"Content-Type": "application/json"},
-  //       body: messageModelToJson(message));
+    try {
+      final data = <String, dynamic>{
+        'usersToAdd': users,
+        'chatRoomId': chatRoomId
+      };
+      final resp = await http.post(
+        '${Environment.apiUrl}/chatRooms/addToChatRoom',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': await AuthService.getToken()
+        },
+        body: json.encode(data),
+      );
 
-  //   final Map<String, dynamic> decodedData = json.decode(resp.body);
+      final Map<String, dynamic> decodedData = json.decode(resp.body);
+      if (decodedData == null) return false;
+      if (decodedData['errors'] != null) return false;
+      if (decodedData['response']['success'] != true) return false;
 
-  //   if (decodedData == null) return null;
-  //   if (decodedData['success'] != true) return null;
+      ChatRoom chatRomUpdated = ChatRoom.fromJson(decodedData['response']['chatRoom']);
 
-  //   final myLasDeviceMessageFromNode = decodedData['myLastDeviceMessage'];
+      this.selectedChatRoom = chatRomUpdated;
 
-  //   List<DeviceMessageModel> deviceMessages = List();
-  //   myLasDeviceMessageFromNode.forEach((value) {
-  //     final message = DeviceMessageModel.fromJson(value);
-  //     deviceMessages.add(message);
-  //   });
-
-  //   print(deviceMessages);
-
-  //   return deviceMessages;
-  // }
-
-  Future<bool> addPlayersToGroup(List<User> users, String chatRoomId) async {
-
-    notifyListeners();
-
-    return true;
-    // final url = '$_url/addToChatRoom?apiKey=$_apiKey';
-    //
-    // final data = <String, dynamic>{'userToAdd': user, 'chatRoomId': chatRoomId};
-    //
-    // final resp = await http.post(
-    //   url,
-    //   headers: {"Content-Type": "application/json"},
-    //   body: json.encode(data),
-    // );
-    //
-    // final decodedData = json.decode(resp.body);
-    //
-    // if (decodedData['success'] != true) return false;
-    //
-    // notifyListeners();
-    //
-    // return true;
+      notifyListeners();
+      return decodedData['response'];
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<bool> removePlayerFromGroup(User user, String chatRoomId) async {
@@ -263,18 +238,15 @@ class ChatRoomService with ChangeNotifier {
       return {
         'success': true,
       };
-
     } catch (e) {
       return {
         'success': false,
       };
     }
-
   }
 
   Future<dynamic> editGroupDescription(
       ChatRoom chatRoom, String newChatRoomDesc) async {
-
     final data = <String, dynamic>{
       'chatRoomToEdit': chatRoom,
       'newChatRoomDesc': newChatRoomDesc
@@ -300,7 +272,6 @@ class ChatRoomService with ChangeNotifier {
       return {
         'success': true,
       };
-
     } catch (e) {
       return {
         'success': false,

@@ -66,6 +66,13 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    this._socketService.socket.off('newChatRoom');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(

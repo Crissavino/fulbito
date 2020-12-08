@@ -2,11 +2,11 @@ part of 'widgets.dart';
 
 class SearchPlayerToAddToGroup extends StatefulWidget {
   @override
-  _SearchPlayerToAddToGroupState createState() => _SearchPlayerToAddToGroupState();
+  _SearchPlayerToAddToGroupState createState() =>
+      _SearchPlayerToAddToGroupState();
 }
 
 class _SearchPlayerToAddToGroupState extends State<SearchPlayerToAddToGroup> {
-
   AuthService authService;
   UsersService usersService;
   ChatRoomService chatRoomService;
@@ -48,8 +48,11 @@ class _SearchPlayerToAddToGroupState extends State<SearchPlayerToAddToGroup> {
           itemCount: userResults.length,
           itemBuilder: (BuildContext context, int index) {
             User user = userResults[index];
-            bool isAlreadyInGroup = this.chatRoom.players
-                .where((player) => player['user']['id'] == userResults[index].id)
+            bool isAlreadyInGroup = this
+                .chatRoom
+                .players
+                .where(
+                    (player) => player['user']['_id'] == userResults[index].id)
                 .isNotEmpty;
             if (!isAlreadyInGroup) {
               return PlayerRowToGroup(

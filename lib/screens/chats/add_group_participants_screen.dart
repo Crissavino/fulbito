@@ -120,7 +120,7 @@ class _AddGroupParticipantsScreenState
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.all(15.0),
+                  padding: EdgeInsets.only(top: 15.0, left: 15.0, right: 15.0, bottom: 50.0),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -131,19 +131,19 @@ class _AddGroupParticipantsScreenState
                     highlightColor: Colors.transparent,
                     onPressed: () async {
                       // agregar jugadores al grupo y vaciar el arreglo
-                      final bool addPlayersResponse = await this.chatRoomService.addPlayersToGroup(
-                          this.usersService.selectedSearchedUsers,
-                          this.chatRoomService.selectedChatRoom.id
-                      );
+                      final addPlayersResponse = await this
+                          .chatRoomService
+                          .addPlayersToGroup(
+                              this.usersService.selectedSearchedUsers,
+                              this.chatRoomService.selectedChatRoom.id);
 
-                      if(addPlayersResponse) {
+                      if (addPlayersResponse['success'] == true) {
                         this.usersService.emptySelectedUsersArray();
                         Navigator.pop(context);
                       } else {
                         mostrarAlerta(context, 'Ups...',
                             'Ocurrio un error al agregar los jugadores');
                       }
-
                     },
                     padding: EdgeInsets.all(15.0),
                     shape: RoundedRectangleBorder(

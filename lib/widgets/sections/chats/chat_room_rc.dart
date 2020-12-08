@@ -10,24 +10,24 @@ import 'package:fulbito/services/socket_service.dart';
 import 'package:provider/provider.dart';
 
 class ChatRoomRC extends StatelessWidget {
-  final ChatRoom chat;
+  ChatRoom chat;
   final User currentUser;
   final dynamic currentDevice;
   final AnimationController animationController;
   final SocketService socketService;
 
-  const ChatRoomRC({
-    Key key,
+  ChatRoomRC({
     @required this.chat,
     @required this.currentUser,
     @required this.currentDevice,
     @required this.animationController,
     @required this.socketService,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+    final chatRoomService =
+        Provider.of<ChatRoomService>(context, listen: false);
 
     return FadeTransition(
       opacity: animationController,
@@ -46,9 +46,10 @@ class ChatRoomRC extends StatelessWidget {
 
   GestureDetector _buildChatRoomRow(
       BuildContext context, ChatRoom chat, ChatRoomService chatRoomService) {
-    final DateTime parsedTime = DateTime.tryParse(chat.lastMessage['time']);
+    final DateTime parsedTime = DateTime.parse(chat.lastMessage['time']);
     final messageHour = parsedTime.hour;
-    final messageMinute = parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
+    final messageMinute =
+        parsedTime.minute < 10 ? '0${parsedTime.minute}' : parsedTime.minute;
     final messageTime = '$messageHour:$messageMinute';
     bool isUnread = chat.lastMessage['unread'] ?? true;
 
@@ -71,7 +72,7 @@ class ChatRoomRC extends StatelessWidget {
       },
       child: Container(
         margin:
-        EdgeInsets.only(top: 10.0, bottom: 2.0, right: 10.0, left: 10.0),
+            EdgeInsets.only(top: 10.0, bottom: 2.0, right: 10.0, left: 10.0),
         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -131,22 +132,22 @@ class ChatRoomRC extends StatelessWidget {
                 SizedBox(height: 5.0),
                 isUnread
                     ? Container(
-                  width: 40.0,
-                  height: 20.0,
-                  decoration: BoxDecoration(
-                    color: Colors.green[400],
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'NEW',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
+                        width: 40.0,
+                        height: 20.0,
+                        decoration: BoxDecoration(
+                          color: Colors.green[400],
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'NEW',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
                     : Text(''),
               ],
             ),
@@ -155,5 +156,4 @@ class ChatRoomRC extends StatelessWidget {
       ),
     );
   }
-
 }
