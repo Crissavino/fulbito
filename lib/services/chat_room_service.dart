@@ -132,10 +132,11 @@ class ChatRoomService with ChangeNotifier {
     }
   }
 
-  Future<dynamic> addPlayersToGroup(List<User> users, String chatRoomId) async {
+  Future<dynamic> addPlayersToGroup(User userWhoAdd, List<User> users, String chatRoomId) async {
 
     try {
       final data = <String, dynamic>{
+        'userWhoAdd': userWhoAdd,
         'usersToAdd': users,
         'chatRoomId': chatRoomId
       };

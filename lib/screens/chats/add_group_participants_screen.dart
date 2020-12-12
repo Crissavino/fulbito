@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/mostrar_alerta.dart';
+import 'package:fulbito/models/chat_room.dart';
 import 'package:fulbito/models/user.dart';
+import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/chat_room_service.dart';
+import 'package:fulbito/services/socket_service.dart';
 import 'package:fulbito/services/users_service.dart';
 import 'package:fulbito/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -17,11 +20,24 @@ class _AddGroupParticipantsScreenState
     extends State<AddGroupParticipantsScreen> {
   UsersService usersService;
   ChatRoomService chatRoomService;
+  AuthService authService;
+  SocketService _socketService;
+  User _currentUser;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    this._socketService.socket.off('players-added-to-chatroom');
+    super.dispose();
+  }
 
   @override
   void initState() {
     this.usersService = Provider.of<UsersService>(context, listen: false);
+    this.authService = Provider.of<AuthService>(context, listen: false);
+    this._currentUser = this.authService.user;
     this.chatRoomService = Provider.of<ChatRoomService>(context, listen: false);
+    this._socketService = Provider.of<SocketService>(context, listen: false);
 
     super.initState();
   }
@@ -120,7 +136,8 @@ class _AddGroupParticipantsScreenState
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.only(top: 15.0, left: 15.0, right: 15.0, bottom: 50.0),
+                  padding: EdgeInsets.only(
+                      top: 15.0, left: 15.0, right: 15.0, bottom: 50.0),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -134,10 +151,19 @@ class _AddGroupParticipantsScreenState
                       final addPlayersResponse = await this
                           .chatRoomService
                           .addPlayersToGroup(
+                              this._currentUser,
                               this.usersService.selectedSearchedUsers,
                               this.chatRoomService.selectedChatRoom.id);
 
                       if (addPlayersResponse['success'] == true) {
+                        this
+                            ._socketService
+                            .socket
+                            .emit('usersAddedToChatRoom', {
+                          'chatRoom': this.chatRoomService.selectedChatRoom,
+                          'addedUsers': this.usersService.selectedSearchedUsers
+                        });
+                        this.chatRoomService.selectedChatRoom = ChatRoom.fromJson(addPlayersResponse['chatRoom']);
                         this.usersService.emptySelectedUsersArray();
                         Navigator.pop(context);
                       } else {

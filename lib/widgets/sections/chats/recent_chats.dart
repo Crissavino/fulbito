@@ -43,6 +43,7 @@ class _RecentChatsState extends State<RecentChats>
         .socket
         .on('chatRoomMessage-recentChats', _receiveChatRoomMessage);
     this._socketService.socket.on('newChatRoom-recentChats', _chatRoomCreated);
+    this._socketService.socket.on('usersAddedToChatRoom-recentChats', _userAddedToChatRoom);
     this
         ._socketService
         .socket
@@ -59,6 +60,7 @@ class _RecentChatsState extends State<RecentChats>
     this._socketService.socket.off('chatRoomMessage-recentChats');
     this._socketService.socket.off('newChatRoom-recentChats');
     this._socketService.socket.off('leaveChatRoom-recentChats');
+    this._socketService.socket.off('usersAddedToChatRoom-recentChats');
     super.dispose();
   }
 
@@ -91,6 +93,27 @@ class _RecentChatsState extends State<RecentChats>
   }
 
   void _chatRoomCreated(dynamic payload) {
+    ChatRoomRC newChatRoomRC = ChatRoomRC(
+      chat: ChatRoom.fromJson(payload['newChatRoom']),
+      currentUser: this._currentUser,
+      currentDevice: this._currentDevice,
+      animationController: AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 800),
+      ),
+      socketService: this._socketService,
+    );
+
+    setState(() {
+      this._allMyChatRooms.insert(0, newChatRoomRC);
+    });
+
+    newChatRoomRC.animationController.forward();
+
+    this._focusNode.requestFocus();
+  }
+
+  void _userAddedToChatRoom(dynamic payload) {
     ChatRoomRC newChatRoomRC = ChatRoomRC(
       chat: ChatRoom.fromJson(payload['newChatRoom']),
       currentUser: this._currentUser,

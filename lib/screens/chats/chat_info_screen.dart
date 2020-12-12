@@ -160,7 +160,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                       backgroundColor: Colors.black38,
                       child: IconButton(
                         icon: Icon(Icons.edit),
-                        onPressed: () => getImage,
+                        onPressed: () => getImage(),
                         color: Colors.white,
                         splashColor: Colors.transparent,
                       ),

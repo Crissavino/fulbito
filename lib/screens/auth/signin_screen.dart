@@ -176,6 +176,10 @@ class _SigninScreenState extends State<SigninScreen> {
                     mostrarAlerta(
                         context, 'Login incorrecto', 'Revise su credenciales');
                   }
+                } else {
+                  // TODO
+                  mostrarAlerta(context, 'Login incorrecto',
+                      error);
                 }
               },
         padding: EdgeInsets.all(15.0),

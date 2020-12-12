@@ -68,7 +68,6 @@ class _CreateNewGroupState extends State<CreateNewGroup> {
   @override
   void dispose() {
     // TODO: implement dispose
-    this._socketService.socket.off('newChatRoom');
     super.dispose();
   }
 
