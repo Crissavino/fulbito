@@ -17,6 +17,7 @@ class AuthService with ChangeNotifier {
   User user;
   dynamic device;
   bool _authenticating = false;
+  static String deviceLanguage = Platform.localeName;
 
   // Create storage
   final _storage = new FlutterSecureStorage();

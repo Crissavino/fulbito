@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/mostrar_alerta.dart';
+import 'package:fulbito/globals/translations.dart';
 import 'package:fulbito/screens/auth/signup_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/socket_service.dart';
@@ -24,7 +27,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
   Text _buildPageTitle() {
     return Text(
-      'Sign In',
+      translations[Platform.localeName]['signIn'],
       style: TextStyle(
         color: Colors.white,
         fontFamily: 'OpenSans',
@@ -39,7 +42,7 @@ class _SigninScreenState extends State<SigninScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Email',
+          translations[Platform.localeName]['email'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -60,7 +63,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 Icons.email,
                 color: Colors.grey,
               ),
-              hintText: 'Enter your Email',
+              hintText: translations[Platform.localeName]['enterEmail'],
               hintStyle: kHintTextStyle,
             ),
             onChanged: (val) {
@@ -77,7 +80,7 @@ class _SigninScreenState extends State<SigninScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Password',
+          translations[Platform.localeName]['password'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -103,7 +106,8 @@ class _SigninScreenState extends State<SigninScreen> {
                 Icons.lock,
                 color: Colors.grey,
               ),
-              hintText: 'Enter your Password',
+              hintText: translations[Platform.localeName]['enterPass'],
+              hintStyle: kHintTextStyle,
             ),
           ),
         ),
@@ -118,7 +122,7 @@ class _SigninScreenState extends State<SigninScreen> {
         onPressed: () => print('Forgot Password Button Pressed'),
         padding: EdgeInsets.only(right: 0.0),
         child: Text(
-          'Forgot Password?',
+          translations[Platform.localeName]['forgotPass'],
           style: kLabelStyle,
         ),
       ),
@@ -144,7 +148,7 @@ class _SigninScreenState extends State<SigninScreen> {
             ),
           ),
           Text(
-            'Remember me',
+            translations[Platform.localeName]['rememberMe'],
             style: kLabelStyle,
           ),
         ],
@@ -171,7 +175,7 @@ class _SigninScreenState extends State<SigninScreen> {
         ),
         color: Colors.white,
         child: Text(
-          'SIGN IN',
+          translations[Platform.localeName]['signIn'].toUpperCase(),
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,
@@ -187,13 +191,22 @@ class _SigninScreenState extends State<SigninScreen> {
   Future postSignIn(AuthService _authService, SocketService _socketService) async {
     if (email.isEmpty) {
       mostrarAlerta(
-          context, 'Login incorrecto', 'El email es obligatorio');
+          context,
+          translations[Platform.localeName]['loginFails'],
+          'El email es obligatorio'
+      );
     } else if (password.isEmpty) {
-      mostrarAlerta(context, 'Login incorrecto',
-          'La contraseña es obligatoria');
+      mostrarAlerta(
+          context,
+          translations[Platform.localeName]['loginFails'],
+          translations[Platform.localeName]['mandatoryPass'],
+      );
     } else if (password.length < 6) {
-      mostrarAlerta(context, 'Login incorrecto',
-          'Ingresá una contraseña con mas de 6 caracteres');
+      mostrarAlerta(
+          context,
+          translations[Platform.localeName]['loginFails'],
+          translations[Platform.localeName]['passWithMoreSix'],
+      );
     } else {
       FocusScope.of(context).unfocus();
       final loginResp =
@@ -204,7 +217,10 @@ class _SigninScreenState extends State<SigninScreen> {
         Navigator.pushReplacementNamed(context, 'chats');
       } else {
         mostrarAlerta(
-            context, 'Login incorrecto', 'Revise su credenciales');
+            context,
+            translations[Platform.localeName]['loginFails'],
+            translations[Platform.localeName]['checkCredentials'],
+        );
       }
     }
   }
@@ -212,16 +228,16 @@ class _SigninScreenState extends State<SigninScreen> {
   Widget _buildSignInWithText() {
     return Column(
       children: <Widget>[
+        // Text(
+        //   '- OR -',
+        //   style: TextStyle(
+        //     color: Colors.white,
+        //     fontWeight: FontWeight.w400,
+        //   ),
+        // ),
+        // SizedBox(height: 20.0),
         Text(
-          '- OR -',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Text(
-          'Sign in with',
+          translations[Platform.localeName]['signInWith'],
           style: kLabelStyle,
         ),
       ],
@@ -291,7 +307,7 @@ class _SigninScreenState extends State<SigninScreen> {
         text: TextSpan(
           children: [
             TextSpan(
-              text: 'Don\'t have an Account? ',
+              text: translations[Platform.localeName]['dontAccount'],
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.0,
