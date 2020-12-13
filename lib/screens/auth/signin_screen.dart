@@ -63,7 +63,6 @@ class _SigninScreenState extends State<SigninScreen> {
               hintText: 'Enter your Email',
               hintStyle: kHintTextStyle,
             ),
-            validator: (val) => val.isEmpty ? 'Enter an email' : null,
             onChanged: (val) {
               setState(() => email = val);
             },
@@ -87,8 +86,8 @@ class _SigninScreenState extends State<SigninScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            validator: (val) =>
-                val.length < 6 ? 'Enter a password 6+ chars long' : null,
+            // validator: (val) =>
+            //     val.length < 6 ? 'Enter a password 6+ chars long' : null,
             obscureText: true,
             style: TextStyle(
               color: Colors.grey[700],
@@ -164,23 +163,7 @@ class _SigninScreenState extends State<SigninScreen> {
         onPressed: _authService.authenticating
             ? null
             : () async {
-                if (_formKey.currentState.validate()) {
-                  FocusScope.of(context).unfocus();
-                  final loginResp =
-                      await _authService.login(this.email, this.password);
-                  if (loginResp == true) {
-                    await _socketService.connect(_authService.user);
-
-                    Navigator.pushReplacementNamed(context, 'chats');
-                  } else {
-                    mostrarAlerta(
-                        context, 'Login incorrecto', 'Revise su credenciales');
-                  }
-                } else {
-                  // TODO
-                  mostrarAlerta(context, 'Login incorrecto',
-                      error);
-                }
+                await postSignIn(_authService, _socketService);
               },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -199,6 +182,31 @@ class _SigninScreenState extends State<SigninScreen> {
         ),
       ),
     );
+  }
+
+  Future postSignIn(AuthService _authService, SocketService _socketService) async {
+    if (email.isEmpty) {
+      mostrarAlerta(
+          context, 'Login incorrecto', 'El email es obligatorio');
+    } else if (password.isEmpty) {
+      mostrarAlerta(context, 'Login incorrecto',
+          'La contraseña es obligatoria');
+    } else if (password.length < 6) {
+      mostrarAlerta(context, 'Login incorrecto',
+          'Ingresá una contraseña con mas de 6 caracteres');
+    } else {
+      FocusScope.of(context).unfocus();
+      final loginResp =
+          await _authService.login(this.email, this.password);
+      if (loginResp == true) {
+        await _socketService.connect(_authService.user);
+
+        Navigator.pushReplacementNamed(context, 'chats');
+      } else {
+        mostrarAlerta(
+            context, 'Login incorrecto', 'Revise su credenciales');
+      }
+    }
   }
 
   Widget _buildSignInWithText() {

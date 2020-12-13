@@ -65,7 +65,6 @@ class _SignupScreenState extends State<SignupScreen> {
               hintText: 'Enter your full name',
               hintStyle: kHintTextStyle,
             ),
-            validator: (val) => val.isEmpty ? 'Enter your name' : null,
             onChanged: (val) {
               setState(() => fullName = val);
             },
@@ -104,7 +103,6 @@ class _SignupScreenState extends State<SignupScreen> {
               hintText: 'Enter your Email',
               hintStyle: kHintTextStyle,
             ),
-            validator: (val) => val.isEmpty ? 'Enter an email' : null,
             onChanged: (val) {
               setState(() => email = val);
             },
@@ -128,8 +126,6 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            validator: (val) =>
-                val.length < 6 ? 'Enter a password 6+ chars long' : null,
             obscureText: true,
             style: TextStyle(
               color: Colors.grey[700],
@@ -138,7 +134,6 @@ class _SignupScreenState extends State<SignupScreen> {
             onChanged: (val) {
               setState(() {
                 password = val;
-                confirmPassword = val;
               });
             },
             decoration: InputDecoration(
@@ -171,24 +166,13 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            validator: (val) {
-              if (val.length < 6) {
-                return 'Enter a password 6+ chars long';
-              }
-
-              if (val != confirmPassword) {
-                return 'Wrong!';
-              }
-
-              return null;
-            },
             obscureText: true,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
             ),
             onChanged: (val) {
-              setState(() => password = val);
+              setState(() => confirmPassword = val);
             },
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -244,7 +228,28 @@ class _SignupScreenState extends State<SignupScreen> {
         onPressed: _authService.authenticating
             ? null
             : () async {
-                if (_formKey.currentState.validate()) {
+                if (fullName.isEmpty) {
+                  mostrarAlerta(
+                      context, 'Registro incorrecto', 'El nombre completo es obligatorio');
+                } else if (email.isEmpty) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'El email es obligatorio');
+                } else if (password.isEmpty) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'La contraseña es obligatoria');
+                } else if (password.length < 6) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'Ingresá una contraseña con mas de 6 caracteres');
+                } else if (confirmPassword.isEmpty) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'La confirmacion de la contraseña es obligatoria');
+                } else if (confirmPassword.length < 6) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'Ingresá una contraseña con mas de 6 caracteres');
+                } else if (password != confirmPassword) {
+                  mostrarAlerta(context, 'Registro incorrecto',
+                      'Las contraseñas no coinciden');
+                } else {
                   final registerResp = await _authService.register(
                       this.fullName, this.email, this.password);
                   if (registerResp == true) {
