@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -24,10 +25,12 @@ class _SigninScreenState extends State<SigninScreen> {
   String email = '';
   String password = '';
   bool _rememberMe = false;
+  bool cantSeePassword = true;
+  String localeName = Platform.localeName.split('_')[0];
 
   Text _buildPageTitle() {
     return Text(
-      translations[Platform.localeName]['signIn'],
+      translations[localeName]['signIn'],
       style: TextStyle(
         color: Colors.white,
         fontFamily: 'OpenSans',
@@ -42,7 +45,7 @@ class _SigninScreenState extends State<SigninScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          translations[Platform.localeName]['email'],
+          translations[localeName]['email'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -63,7 +66,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 Icons.email,
                 color: Colors.grey,
               ),
-              hintText: translations[Platform.localeName]['enterEmail'],
+              hintText: translations[localeName]['enterEmail'],
               hintStyle: kHintTextStyle,
             ),
             onChanged: (val) {
@@ -80,7 +83,7 @@ class _SigninScreenState extends State<SigninScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          translations[Platform.localeName]['password'],
+          translations[localeName]['password'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -91,7 +94,7 @@ class _SigninScreenState extends State<SigninScreen> {
           child: TextFormField(
             // validator: (val) =>
             //     val.length < 6 ? 'Enter a password 6+ chars long' : null,
-            obscureText: true,
+            obscureText: cantSeePassword,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
@@ -106,7 +109,22 @@ class _SigninScreenState extends State<SigninScreen> {
                 Icons.lock,
                 color: Colors.grey,
               ),
-              hintText: translations[Platform.localeName]['enterPass'],
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (cantSeePassword) {
+                      cantSeePassword = false;
+                    } else {
+                      cantSeePassword = true;
+                    }
+                  });
+                },
+              ),
+              hintText: translations[localeName]['enterPass'],
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -122,7 +140,7 @@ class _SigninScreenState extends State<SigninScreen> {
         onPressed: () => print('Forgot Password Button Pressed'),
         padding: EdgeInsets.only(right: 0.0),
         child: Text(
-          translations[Platform.localeName]['forgotPass'],
+          translations[localeName]['forgotPass'],
           style: kLabelStyle,
         ),
       ),
@@ -148,7 +166,7 @@ class _SigninScreenState extends State<SigninScreen> {
             ),
           ),
           Text(
-            translations[Platform.localeName]['rememberMe'],
+            translations[localeName]['rememberMe'],
             style: kLabelStyle,
           ),
         ],
@@ -175,7 +193,7 @@ class _SigninScreenState extends State<SigninScreen> {
         ),
         color: Colors.white,
         child: Text(
-          translations[Platform.localeName]['signIn'].toUpperCase(),
+          translations[localeName]['signIn'].toUpperCase(),
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,
@@ -188,38 +206,35 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
-  Future postSignIn(AuthService _authService, SocketService _socketService) async {
+  Future postSignIn(
+      AuthService _authService, SocketService _socketService) async {
     if (email.isEmpty) {
-      mostrarAlerta(
-          context,
-          translations[Platform.localeName]['loginFails'],
-          'El email es obligatorio'
-      );
+      mostrarAlerta(context, translations[localeName]['loginFails'],
+          'El email es obligatorio');
     } else if (password.isEmpty) {
       mostrarAlerta(
-          context,
-          translations[Platform.localeName]['loginFails'],
-          translations[Platform.localeName]['mandatoryPass'],
+        context,
+        translations[localeName]['loginFails'],
+        translations[localeName]['mandatoryPass'],
       );
     } else if (password.length < 6) {
       mostrarAlerta(
-          context,
-          translations[Platform.localeName]['loginFails'],
-          translations[Platform.localeName]['passWithMoreSix'],
+        context,
+        translations[localeName]['loginFails'],
+        translations[localeName]['passWithMoreSix'],
       );
     } else {
       FocusScope.of(context).unfocus();
-      final loginResp =
-          await _authService.login(this.email, this.password);
+      final loginResp = await _authService.login(this.email, this.password);
       if (loginResp == true) {
         await _socketService.connect(_authService.user);
 
         Navigator.pushReplacementNamed(context, 'chats');
       } else {
         mostrarAlerta(
-            context,
-            translations[Platform.localeName]['loginFails'],
-            translations[Platform.localeName]['checkCredentials'],
+          context,
+          translations[localeName]['loginFails'],
+          translations[localeName]['checkCredentials'],
         );
       }
     }
@@ -237,7 +252,7 @@ class _SigninScreenState extends State<SigninScreen> {
         // ),
         // SizedBox(height: 20.0),
         Text(
-          translations[Platform.localeName]['signInWith'],
+          translations[localeName]['signInWith'],
           style: kLabelStyle,
         ),
       ],
@@ -307,7 +322,7 @@ class _SigninScreenState extends State<SigninScreen> {
         text: TextSpan(
           children: [
             TextSpan(
-              text: translations[Platform.localeName]['dontAccount'],
+              text: translations[localeName]['dontAccount'],
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.0,
@@ -366,7 +381,7 @@ class _SigninScreenState extends State<SigninScreen> {
                             ),
                             _buildPasswordTF(),
                             _buildForgotPasswordBtn(),
-                            _buildRememberMeCheckbox(),
+                            // _buildRememberMeCheckbox(),
                             _buildLoginBtn(),
                             _buildSignInWithText(),
                             _buildSocialBtnRow(),

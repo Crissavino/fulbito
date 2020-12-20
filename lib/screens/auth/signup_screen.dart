@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fulbito/globals/constants.dart';
@@ -23,6 +25,9 @@ class _SignupScreenState extends State<SignupScreen> {
   String password = '';
   String confirmPassword = '';
   bool _rememberMe = false;
+  bool cantSeePassword = true;
+  bool cantSeeConfirmPassword = true;
+  String localeName = Platform.localeName.split('_')[0];
 
   Text _buildPageTitle() {
     return Text(
@@ -126,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            obscureText: true,
+            obscureText: cantSeePassword,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
@@ -142,6 +147,21 @@ class _SignupScreenState extends State<SignupScreen> {
               prefixIcon: Icon(
                 Icons.lock,
                 color: Colors.grey,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (cantSeePassword) {
+                      cantSeePassword = false;
+                    } else {
+                      cantSeePassword = true;
+                    }
+                  });
+                },
               ),
               hintText: 'Enter your Password',
               hintStyle: kHintTextStyle,
@@ -166,7 +186,7 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            obscureText: true,
+            obscureText: cantSeeConfirmPassword,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
@@ -180,6 +200,21 @@ class _SignupScreenState extends State<SignupScreen> {
               prefixIcon: Icon(
                 Icons.lock,
                 color: Colors.grey,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (cantSeeConfirmPassword) {
+                      cantSeeConfirmPassword = false;
+                    } else {
+                      cantSeeConfirmPassword = true;
+                    }
+                  });
+                },
               ),
               hintText: 'Enter your Password',
               hintStyle: kHintTextStyle,
@@ -353,7 +388,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             SizedBox(height: 10.0),
                             _buildConfirmPasswordTF(),
                             SizedBox(height: 20.0),
-                            _buildRememberMeCheckbox(),
+                            // _buildRememberMeCheckbox(),
                             _buildRegisterBtn(),
                             SizedBox(height: 10.0),
                             _buildSignInBtn()
