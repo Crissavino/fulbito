@@ -185,6 +185,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       ),
                     ),
                   ),
+                  // Container(
+                  //   color: Colors.white,
+                  //   child: Divider(
+                  //     thickness: 1.0,
+                  //   ),
+                  // ),
                   _buildMessageComposer(),
                 ],
               ),
@@ -249,41 +255,48 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       height: 70.0,
       color: Colors.white,
-      child: Row(
-        children: <Widget>[
-          // IconButton(
-          //   icon: Icon(Icons.photo),
-          //   iconSize: 25.0,
-          //   color: Colors.green[400],
-          //   onPressed: () {},
-          // ),
-          SizedBox(
-            width: 25.0,
+      child: Column(
+        children: [
+          Divider(
+            thickness: 1.0,
           ),
-          Expanded(
-            child: TextField(
-              controller: _textController,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration.collapsed(
-                hintText: 'Enviar mensaje...',
+          Row(
+            children: <Widget>[
+              // IconButton(
+              //   icon: Icon(Icons.photo),
+              //   iconSize: 25.0,
+              //   color: Colors.green[400],
+              //   onPressed: () {},
+              // ),
+              SizedBox(
+                width: 25.0,
               ),
-              focusNode: _focusNode,
-            ),
-          ),
-          Platform.isIOS
-              ? CupertinoButton(
-                  child: Text(
-                    'Enviar',
-                    style: TextStyle(color: Colors.green[400]),
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration.collapsed(
+                    hintText: 'Enviar mensaje...',
                   ),
-                  onPressed: () => _handleSubmit(),
-                )
-              : IconButton(
-                  icon: Icon(Icons.send),
-                  iconSize: 25.0,
-                  color: Colors.green[400],
-                  onPressed: () => _handleSubmit(),
+                  focusNode: _focusNode,
                 ),
+              ),
+              Platform.isIOS
+                  ? CupertinoButton(
+                child: Text(
+                  'Enviar',
+                  style: TextStyle(color: Colors.green[400]),
+                ),
+                onPressed: () => _handleSubmit(),
+              )
+                  : IconButton(
+                icon: Icon(Icons.send),
+                iconSize: 25.0,
+                color: Colors.green[400],
+                onPressed: () => _handleSubmit(),
+              ),
+            ],
+          )
         ],
       ),
     );
