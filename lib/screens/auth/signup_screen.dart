@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fulbito/globals/constants.dart';
 import 'package:fulbito/globals/mostrar_alerta.dart';
+import 'package:fulbito/globals/translations.dart';
 import 'package:fulbito/screens/auth/signin_screen.dart';
 import 'package:fulbito/services/auth_service.dart';
 import 'package:fulbito/services/socket_service.dart';
@@ -31,7 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Text _buildPageTitle() {
     return Text(
-      'Sign Up',
+      translations[localeName]['signUp'],
       style: TextStyle(
         color: Colors.white,
         fontFamily: 'OpenSans',
@@ -46,7 +47,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Full name',
+          translations[localeName]['fullName'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -56,6 +57,7 @@ class _SignupScreenState extends State<SignupScreen> {
           height: 60.0,
           child: TextFormField(
             keyboardType: TextInputType.name,
+            textCapitalization: TextCapitalization.sentences,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
@@ -67,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Icons.person,
                 color: Colors.grey,
               ),
-              hintText: 'Enter your full name',
+              hintText: translations[localeName]['enterFullName'],
               hintStyle: kHintTextStyle,
             ),
             onChanged: (val) {
@@ -84,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Email',
+          translations[localeName]['email'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -93,7 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.grey[700],
               fontFamily: 'OpenSans',
@@ -105,7 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Icons.email,
                 color: Colors.grey,
               ),
-              hintText: 'Enter your Email',
+              hintText: translations[localeName]['enterEmail'],
               hintStyle: kHintTextStyle,
             ),
             onChanged: (val) {
@@ -122,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Password',
+          translations[localeName]['password'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -163,7 +165,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   });
                 },
               ),
-              hintText: 'Enter your Password',
+              hintText: translations[localeName]['enterPass'],
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -177,7 +179,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Confirm password',
+          translations[localeName]['confirmPassword'],
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -216,7 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   });
                 },
               ),
-              hintText: 'Enter your Password',
+              hintText: translations[localeName]['enterConfirmPassword'],
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -265,25 +267,46 @@ class _SignupScreenState extends State<SignupScreen> {
             : () async {
                 if (fullName.isEmpty) {
                   mostrarAlerta(
-                      context, 'Registro incorrecto', 'El nombre completo es obligatorio');
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['mandatoryFullName']
+                  );
                 } else if (email.isEmpty) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'El email es obligatorio');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['mandatoryEmail']
+                  );
                 } else if (password.isEmpty) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'La contraseña es obligatoria');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['mandatoryPass']
+                  );
                 } else if (password.length < 6) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'Ingresá una contraseña con mas de 6 caracteres');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['passWithMoreSix']
+                  );
                 } else if (confirmPassword.isEmpty) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'La confirmacion de la contraseña es obligatoria');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['mandatoryConfirmPass']
+                  );
                 } else if (confirmPassword.length < 6) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'Ingresá una contraseña con mas de 6 caracteres');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['passWithMoreSix']
+                  );
                 } else if (password != confirmPassword) {
-                  mostrarAlerta(context, 'Registro incorrecto',
-                      'Las contraseñas no coinciden');
+                  mostrarAlerta(
+                      context,
+                      translations[localeName]['registerFails'],
+                      translations[localeName]['passNotMatch']
+                  );
                 } else {
                   final registerResp = await _authService.register(
                       this.fullName, this.email, this.password);
@@ -291,9 +314,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     await _socketService.connect(_authService.user);
                     Navigator.pushReplacementNamed(context, 'chats');
                   } else {
-                    // mostrar alerta
-                    mostrarAlerta(context, 'Registro incorrecto',
-                        'Sus credenciales no son validas');
+                    mostrarAlerta(
+                        context,
+                        translations[localeName]['registerFails'],
+                        translations[localeName]['invalidCredentials']
+                    );
                   }
                 }
               },

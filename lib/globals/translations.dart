@@ -9,10 +9,22 @@ const translations = {
     'rememberMe': 'Remember me',
     'signInWith': 'Sign in with',
     'dontAccount': 'Don\'t have an account? ',
-    'loginFails': 'Login wrong',
-    'mandatoryPass': 'The password is mandatory',
+    'loginFails': 'Login failed',
+    'mandatoryPass': 'The password is required',
     'passWithMoreSix': 'Enter a password with more than 6 characters',
-    'checkCredentials': 'Check yours credentials'
+    'checkCredentials': 'Check yours credentials',
+    'signUp': 'Sign Up',
+    'fullName': 'Full name',
+    'enterFullName': 'Enter your full name',
+    'confirmPassword': 'Confirm password',
+    'enterConfirmPassword': 'Confirm password',
+    'registerFails': 'Register failed',
+    'mandatoryFullName': 'Full name is required',
+    'mandatoryEmail': 'The email is required',
+    'mandatoryConfirmPass': 'Password confirmation is mandatory',
+    'passNotMatch': 'Passwords do not match',
+    'invalidCredentials': 'Your credentials are not valid'
+
   },
   'es': {
     'signIn': 'Iniciar sesión',
@@ -27,6 +39,18 @@ const translations = {
     'loginFails': 'Login incorrecto',
     'mandatoryPass': 'La contraseña es obligatoria',
     'passWithMoreSix': 'Ingresá una contraseña con mas de 6 caracteres',
-    'checkCredentials': 'Revise su credenciales'
+    'checkCredentials': 'Revise su credenciales',
+    'signUp': 'Registro',
+    'fullName': 'Nombre completo',
+    'enterFullName': 'Enter your full name',
+    'confirmPassword': 'Confirmar contraseña',
+    'enterConfirmPassword': 'Confirmar contraseña',
+    'registerFails': 'Registro incorrecto',
+    'mandatoryFullName': 'El nombre completo es obligatorio',
+    'mandatoryEmail': 'El email es obligatorio',
+    'mandatoryConfirmPass': 'La confirmacion de la contraseña es obligatoria',
+    'passNotMatch': 'Las contraseñas no coinciden',
+    'invalidCredentials': 'Sus credenciales no son validas'
+
   }
 };

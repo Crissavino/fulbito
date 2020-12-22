@@ -92,8 +92,6 @@ class _SigninScreenState extends State<SigninScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            // validator: (val) =>
-            //     val.length < 6 ? 'Enter a password 6+ chars long' : null,
             obscureText: cantSeePassword,
             style: TextStyle(
               color: Colors.grey[700],
