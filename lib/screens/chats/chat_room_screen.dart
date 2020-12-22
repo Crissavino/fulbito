@@ -185,12 +185,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       ),
                     ),
                   ),
-                  // Container(
-                  //   color: Colors.white,
-                  //   child: Divider(
-                  //     thickness: 1.0,
-                  //   ),
-                  // ),
                   _buildMessageComposer(),
                 ],
               ),
